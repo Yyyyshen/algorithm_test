@@ -15,14 +15,14 @@ void test_func2();//随机字串生成测试
 int main()
 {
 	//test_func1();
-	test_fun2();
+	test_func2();
 	system("pause");
 	return 0;
 }
 
-void test_fun2()
+void test_func2()
 {
-	std::string ret = random_str(20);
+	std::string ret = random_str(50);
 	std::cout << "random str: " << ret << std::endl;
 }
 
