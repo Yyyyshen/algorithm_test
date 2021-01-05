@@ -2,14 +2,25 @@
 //
 
 #include <iostream>
+#include <Windows.h>
+#include "functions.h"
 
 /**
  * 计划有空时在这个项目中刷题LeetCode
  * 根据题大小，可能是5~10题一组（一个子项目）
  */
 
+void test_func();
+
 int main()
 {
-    std::cout << "Hello World!\n";
+	DWORD start_time = GetTickCount64();
+	test_func();
+	DWORD end_time = GetTickCount64();
+	std::cout << "Run time pass: " << end_time - start_time << " ms" << std::endl;
 }
 
+void test_func()
+{
+
+}
