@@ -273,7 +273,7 @@ int* findSum(int arr[], int value, int size) {
 }
 /**
  * 快速排序
- * 
+ *
  * 分治法思想，是冒泡的改进
  * 冒泡每次只交换相邻值，复杂度O(n^2)
  * 快速排序复杂度O(nlogn)
@@ -289,7 +289,7 @@ public:
 
 	}
 	void sort() {
-		quickSort(arr_, 0, len_-1);
+		quickSort(arr_, 0, len_ - 1);
 	}
 	void print() {
 		cout << "arr: ";
@@ -335,6 +335,280 @@ void test_quick_sort()
 	qs.sort();
 	cout << "排序后：" << endl;
 	qs.print();
+}
+
+/**
+ * 给定数组，返回数组
+ * 新数组每个元素为除当前索引值之外所有值相乘
+ */
+int* findProduct(int arr[], int size) {
+	int* product = new int[size];
+	// 暴力解 复杂度O(n^2)
+	for (int i = 0; i < size; i++)
+	{
+		int temp = 1;
+		for (int j = 0; j < size; j++)
+		{
+			if (i == j)
+			{
+				continue;
+			}
+			temp *= arr[j];
+		}
+		product[i] = temp;
+	}
+	return product;
+
+	//网站解法，从头遍历一遍把每个元素左边相乘的值写到当前索引，再从尾遍历把每个元素右边相乘的值与当前索引（此时是左边相乘值）相乘，复杂度O(n)
+	int n = size;
+	int i, temp = 1;
+	int* product = new int[n];  // Allocate memory for the product array 
+
+	// temp contains product of elements on left side excluding arr[i]
+	for (i = 0; i < n; i++)
+	{
+		product[i] = temp;
+		temp *= arr[i];
+	}
+
+	temp = 1;  // Initialize temp to 1 for product on right side 
+
+	// temp contains product of elements on right side excluding arr[i]
+	for (i = n - 1; i >= 0; i--)
+	{
+		product[i] *= temp;
+		temp *= arr[i];
+	}
+
+	return product;
+}
+
+/**
+ * 给定数组，返回最小值
+ * 较简单，复杂度O(n)
+ */
+int findMinimum(int arr[], int size) {
+	int minimum = arr[0];
+	// Write your code here
+	for (int i = 1; i < size; i++)
+	{
+		if (arr[i] < minimum)
+		{
+			minimum = arr[i];
+		}
+	}
+	return minimum;
+}
+
+/**
+ * 给定数组，找出第一个唯一的数
+ */
+int findFirstUnique(int arr[], int size) {
+	//暴力解，嵌套for循环，复杂度O(n^2)，网站上是同解，等看到哈希，会有更好的方法
+	int ret = -1;
+	for (int i = 0; i < size; i++)
+	{
+		bool is_unique = true;
+		for (int j = 0; j < size; j++)
+		{
+			if (i == j)
+			{
+				continue;
+			}
+			if (arr[i] == arr[j])
+			{
+				is_unique = false;
+			}
+		}
+		if (is_unique)
+		{
+			ret = arr[i];
+			break;
+		}
+	}
+	return ret;
+}
+
+/**
+ * 给定数组，找出第二大的数
+ */
+int findSecondMaximum(int arr[], int size) {
+	int secondmax = INT_MIN;
+	// 暴力解，每个元素查找比自身大的数量，大1的为结果，复杂度O(n^2)
+	for (int i = 0; i < size; i++)
+	{
+		int num_bigger = 0;
+		for (int j = 0; j < size; j++)
+		{
+			if (arr[j] > arr[i])
+			{
+				num_bigger++;
+			}
+		}
+		if (num_bigger == 1)
+		{
+			secondmax = arr[i];
+			break;
+		}
+	}
+	return secondmax;
+
+	// 网站解1：遍历两次数组，第一次找最大值，第二次找比最大值小的最大值，复杂度O(n)
+	int max = INT_MIN;
+	int secondmax = INT_MIN;
+	for (int i = 0; i < size; i++) {
+		if (arr[i] > max)
+			max = arr[i];
+	}//end of for-loop
+
+	for (int i = 0; i < size; i++) {
+		if (arr[i] > secondmax && arr[i] < max)
+			secondmax = arr[i];
+	}//end of for-loop
+
+	return secondmax;
+
+	//网站解2：一次遍历，但需要使用else if
+	for (int i = 0; i < size; i++) {
+		if (arr[i] > max) {
+			secondmax = max;
+			max = arr[i];
+		}
+		else if (arr[i] > secondmax && arr[i] != max) {
+			secondmax = arr[i];
+		}
+	}//end of for-loop
+	return secondmax;
+}
+
+/**
+ * 数组右旋一次
+ */
+void rotateArray(int arr[], int size) {
+
+	//Store Last Element of Array.
+	//Start from last and Right Shift the Array by one.
+	//Store the last element saved to be the first element of array.
+	int lastElement = arr[size - 1];
+	//所有元素后移一位，把最后一位填到第一位
+	for (int i = size - 1; i > 0; i--) {
+		arr[i] = arr[i - 1];
+	}
+	arr[0] = lastElement;
+
+}
+
+/**
+ * 给定数组，让负数在同一边，正数在另一边，例如：{-1，-1，1，1}
+ */
+void reArrange(int arr[], int size) {
+
+	int* newArray = new int[size];
+	int newArray_index = 0;
+
+	//两次循环分别将负值与正值填入一个新数组，再整体拷贝
+	for (int i = 0; i < size; i++) {
+		if (arr[i] < 0)
+			newArray[newArray_index++] = arr[i];
+	}
+
+	for (int i = 0; i < size; i++) {
+
+		if (arr[i] >= 0)
+			newArray[newArray_index++] = arr[i];
+	}
+
+	for (int j = 0; j < newArray_index; j++) {
+		arr[j] = newArray[j];
+	}
+	delete[] newArray;
+
+	//在同数组内操作
+	int j = 0;
+	for (int i = 0; i < size; i++) {
+		if (arr[i] < 0) {   // if negative number found
+			if (i != j)
+				swap(arr[i], arr[j]);  // swapping with leftmost positive 
+			j++;
+		}
+	}
+}
+/**
+ * 给定数组（已经排序），重新排序为最大、最小值排列（最大，最小、第二大、第二小...类推）
+ */
+void maxMin(int arr[], int size) {
+	//创建新数组
+	int* result = new int[size];
+
+	int pointerSmall = 0,     //PointerSmall => Start of arr
+		pointerLarge = size - 1;   //PointerLarge => End of arr
+
+		//Flag which will help in switching between two pointers
+	bool switchPointer = true;
+
+	for (int i = 0; i < size; i++) {
+		if (switchPointer)
+			result[i] = arr[pointerLarge--]; // copy large values
+		else
+			result[i] = arr[pointerSmall++]; // copy small values
+
+		switchPointer = !switchPointer;   // switching between samll and large
+	}
+
+	for (int j = 0; j < size; j++) {
+		arr[j] = result[j];    // copying to original array
+	}
+	delete[] result;
+
+	//不使用额外空间
+	int maxIdx = size - 1;
+	int minIdx = 0;
+	int maxElem = arr[maxIdx] + 1; // store any element that is greater than the maximum element in the array 
+	for (int i = 0; i < size; i++) {
+		// at even indices we will store maximum elements
+		if (i % 2 == 0) {
+			arr[i] += (arr[maxIdx] % maxElem) * maxElem;
+			maxIdx -= 1;
+		}
+		else { // at odd indices we will store minimum elements
+			arr[i] += (arr[minIdx] % maxElem) * maxElem;
+			minIdx += 1;
+		}
+	}
+	// dividing with maxElem to get original values.
+	for (int i = 0; i < size; i++) {
+		arr[i] = arr[i] / maxElem;
+	}
+}
+
+/**
+ * 给定未排序数组，计算最大子数组和（有负数）
+ */
+int maxSumArr(int arr[], int arrSize) {
+	//暴力解法为计算所有子数组和
+
+	//动态规划，是个比较关键的点，后面还需要细看
+	if (arrSize < 1) {
+		return 0;
+	}
+
+	int currMax = arr[0];
+	int globalMax = arr[0];
+
+	for (int i = 1; i < arrSize; i++) {
+		if (currMax < 0) {
+			currMax = arr[i];
+		}
+		else {
+			currMax += arr[i];
+		}
+
+		if (globalMax < currMax) {
+			globalMax = currMax;
+		}
+	}
+	return globalMax;
+	//Kadane算法的基本思想是扫描整个数组，并在每个位置找到到此结束的子数组的最大和。
 }
 
 int main()
