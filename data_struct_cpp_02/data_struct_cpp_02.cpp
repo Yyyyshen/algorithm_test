@@ -271,9 +271,75 @@ int* findSum(int arr[], int value, int size) {
 	}
 	return arr;
 }
+/**
+ * 快速排序
+ * 
+ * 分治法思想，是冒泡的改进
+ * 冒泡每次只交换相邻值，复杂度O(n^2)
+ * 快速排序复杂度O(nlogn)
+ */
+class QuickSort {
+	int* arr_;
+	int len_;
+public:
+	QuickSort(int* arr, int len)
+		:arr_(arr),
+		len_(len)
+	{
+
+	}
+	void sort() {
+		quickSort(arr_, 0, len_-1);
+	}
+	void print() {
+		cout << "arr: ";
+		for (int i = 0; i < len_; i++) {
+			cout << arr_[i] << " ";
+		}
+		cout << endl;
+	}
+	void quickSort(int* src, int begin, int end) {
+		if (begin < end) {
+			int key = src[begin];
+			int i = begin;
+			int j = end;
+			while (i < j) {
+				while (i < j && src[j] > key) {
+					j--;
+				}
+				if (i < j) {
+					src[i] = src[j];
+					i++;
+				}
+				while (i < j && src[i] < key) {
+					i++;
+				}
+				if (i < j) {
+					src[j] = src[i];
+					j--;
+				}
+			}
+			src[i] = key;
+			quickSort(src, begin, i - 1);
+			quickSort(src, i + 1, end);
+		}
+	}
+};
+
+void test_quick_sort()
+{
+	int arr[9] = { 5, 9, 1, 9, 5, 3, 7, 6, 1 };
+	QuickSort qs(arr, 9);
+	cout << "排序前：" << endl;
+	qs.print();
+	qs.sort();
+	cout << "排序后：" << endl;
+	qs.print();
+}
 
 int main()
 {
+	test_quick_sort();
 	std::cout << "Hello World!\n";
 }
 
