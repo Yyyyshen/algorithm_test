@@ -175,6 +175,137 @@ public:
 		//or null in case the value was not found
 		return currentNode;
 	}
+	//删除节点实现
+	bool Delete(Node* currentNode, int value) {
+		//空树直接返回
+		if (root == NULL) {
+			return false;
+		}
+		//遍历找值
+		Node* parent; //To Store parent of currentNode
+		while (currentNode != NULL && (currentNode->value != value)) {
+			parent = currentNode;
+			if (currentNode->value > value)
+				currentNode = currentNode->leftChild;
+			else
+				currentNode = currentNode->rightChild;
+
+		}
+		//没找到直接返回
+		if (currentNode == NULL) {
+			return false;
+		}
+		else if (currentNode->leftChild == NULL && currentNode->rightChild == NULL) { //要删除的节点无子树
+			//1. Node is Leaf Node
+			//if that leaf node is the root (a tree with just root)
+			if (root->value == currentNode->value) {
+				delete root;
+				root = NULL;
+				return true;
+			}
+			else if (currentNode->value < parent->value) {
+				delete parent->leftChild;
+				parent->leftChild = NULL;
+				return true;
+			}
+			else {
+				delete parent->rightChild;
+				parent->rightChild = NULL;
+				return true;
+			}
+		}
+		else if (currentNode->rightChild == NULL) { //要删除的节点只有左子树
+
+			if (root->value == currentNode->value) {
+				delete root;
+				root = currentNode->leftChild;
+				return true;
+			}
+			else if (currentNode->value < parent->value) {
+
+				delete parent->leftChild;
+				parent->leftChild = currentNode->leftChild;
+				return true;
+			}
+			else {
+				delete parent->rightChild;
+				parent->rightChild = currentNode->leftChild;
+				return true;
+			}
+
+		}
+		else if (currentNode->leftChild == NULL) { //要删除的节点只有右子树
+
+			if (root->value == currentNode->value) {
+				delete root;
+				root = currentNode->rightChild;
+				return true;
+			}
+			else if (currentNode->value < parent->value) {
+				delete parent->leftChild;
+				parent->leftChild = currentNode->rightChild;
+				return true;
+			}
+			else {
+				delete parent->rightChild;
+				parent->rightChild = currentNode->rightChild;
+				return true;
+			}
+
+		}
+		else { //要删除的节点有左右子树
+			//Find Least Value Node in right-subtree of current Node
+			//找到右子树最小值节点（或左侧子树中值最大的节点），交换后删除，或记录值后删除再赋值
+			//这样操作的原因是：该节点是可以替换要删除的节点并仍然保留BST属性的节点之一
+			Node* leastNode = findLeastNode(currentNode->rightChild);
+			//Set CurrentNode's Data to the least value in its right-subtree
+			int tmp = leastNode->value;
+			Delete(root, tmp);
+			currentNode->value = tmp;
+			//Delete the leafNode which had the least value
+			return true;
+		}
+
+	}
+	//找到当前节点下最小节点
+	Node* findLeastNode(Node* currentNode) {
+
+		Node* temp = currentNode;
+		while (temp->leftChild != NULL) {
+			temp = temp->leftChild;
+		}
+
+		return temp;
+	}
+	//删除节点
+	bool deleteBST(int value) {
+		return Delete(root, value);
+	}
+	//先序遍历，从根节点开始，先访问左子节点再访问右子节点；按照“中-左-右”顺序遍历
+	void preOrderPrint(Node* currentNode) {
+		if (currentNode != NULL) {
+			cout << currentNode->value << endl;
+			preOrderPrint(currentNode->leftChild);
+			preOrderPrint(currentNode->rightChild);
+		}
+	}
+	//后序遍历，按照“左-右-中”顺序遍历
+	void postOrderPrint(Node* currentNode) {
+		if (currentNode != NULL) {
+			postOrderPrint(currentNode->leftChild);
+			postOrderPrint(currentNode->rightChild);
+			cout << currentNode->value << endl;
+		}
+	}
+	//中序遍历，按照“左-中-右”顺序遍历
+	void inOrderPrint(Node* currentNode) {
+		if (currentNode != NULL)
+		{
+			inOrderPrint(currentNode->leftChild);
+			cout << currentNode->value << endl;
+			inOrderPrint(currentNode->rightChild);
+		}
+	}
 };
 
 int main()
