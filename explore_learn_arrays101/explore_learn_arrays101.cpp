@@ -11,7 +11,7 @@
 
 using namespace std;
 
-//introduction
+//Introduction
 // 
 //数组
 class DVD
@@ -39,7 +39,7 @@ void test_dvd_arr() {
 //Output : 3
 //Explanation : The first two digits or the last three digits are consecutive 1s.The maximum number of consecutive 1s is 3.
 //
-class Solution1 {
+class Solution1_1 {
 public:
 	int findMaxConsecutiveOnes(vector<int>& nums) {
 		int max = 0;
@@ -78,7 +78,7 @@ public:
 //	7896 contains 4 digits(even number of digits).
 //	Therefore only 12 and 7896 contain an even number of digits.
 // 
-class Solution2 {
+class Solution1_2 {
 public:
 	int findNumbers(vector<int>& nums) {
 		int ret = 0;
@@ -107,7 +107,7 @@ public:
 //Explanation : After squaring, the array becomes[16, 1, 0, 9, 100].
 //After sorting, it becomes[0, 1, 9, 16, 100].
 // 
-class Solution3 {
+class Solution1_3 {
 public:
 	vector<int> sortedSquares(vector<int>& nums) {
 		//vector<int> ret;
@@ -151,6 +151,84 @@ public:
 			j--;
 		}
 		return ans;
+	}
+};
+// 
+//
+
+//Inserting Items Into an Array
+// 
+//插入分为尾部插入，特定位置插入（包括头部插入）
+//尾部插入直接在索引处赋值即可；特定位置插入需要先将索引后元素后移，再赋值
+//
+
+//Given a fixed length array arr of integers, duplicate each occurrence of zero, shifting the remaining elements to the right.
+//Note that elements beyond the length of the original array are not written.
+//Do the above modifications to the input array in place, do not return anything from your function.
+// 
+//Example:
+//Input: [1,0,2,3,0,4,5,0]
+//Output: null
+//Explanation : After calling your function, the input array is modified to : [1, 0, 0, 2, 3, 0, 0, 4]
+// 
+class Solution2_1 {
+public:
+	void duplicateZeros(vector<int>& arr) {
+		//暴力解
+		//for (int i = 0; i < arr.size(); ++i)
+		//{
+		//	if (arr[i] == 0)
+		//	{
+		//		for (int j = arr.size() - 1; j > i; --j)
+		//			arr[j] = arr[j - 1];
+		//		if (i < arr.size() - 1)
+		//			arr[i++ + 1] = 0;
+		//	}
+		//}
+
+		//不嵌套，但内存占的多些
+		int size = arr.size();
+		vector<int> flag(size);
+		for (int i = 0; i < size; ++i)
+			flag[i] = arr[i];
+		for (int i = 0, j = 0; i < size; ++i, ++j)
+		{
+			arr[i] = flag[j];
+			if (flag[j] == 0 && i != size - 1)
+				arr[++i] = 0;
+		}
+	}
+};
+// 
+//
+
+//You are given two integer arrays nums1 and nums2, sorted in non-decreasing order, and two integers m and n, 
+// representing the number of elements in nums1 and nums2 respectively.
+//Merge nums1and nums2 into a single array sorted in non - decreasing order.
+//The final sorted array should not be returned by the function, but instead be stored inside the array nums1.
+// To accommodate this, nums1 has a length of m + n, where the first m elements denote the elements that should be merged, 
+// and the last n elements are set to 0 and should be ignored.nums2 has a length of n.
+// 
+//Example:
+//Input: nums1 = [1, 2, 3, 0, 0, 0], m = 3, nums2 = [2, 5, 6], n = 3
+//Output : [1, 2, 2, 3, 5, 6]
+//Explanation : The arrays we are merging are[1, 2, 3] and [2, 5, 6].
+//The result of the merge is[1, 2, 2, 3, 5, 6] with the underlined elements coming from nums1.
+// 
+class Solution {
+public:
+	void merge(vector<int>& nums1, int m, vector<int>& nums2, int n) {
+		vector<int> nums1_temp(m);
+		for (int i = 0; i < m; ++i)
+			nums1_temp[i] = nums1[i];
+		int index = 0;
+		int i = 0, j = 0;
+		for (; i < m && j < n;)
+			nums1[index++] = nums1_temp[i] > nums2[j] ? nums2[j++] : nums1_temp[i++];
+		for (; i < m; ++i)
+			nums1[index++] = nums1_temp[i];
+		for (; j < n; ++j)
+			nums1[index++] = nums2[j];
 	}
 };
 // 
