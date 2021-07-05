@@ -215,7 +215,7 @@ public:
 //Explanation : The arrays we are merging are[1, 2, 3] and [2, 5, 6].
 //The result of the merge is[1, 2, 2, 3, 5, 6] with the underlined elements coming from nums1.
 // 
-class Solution {
+class Solution2_2 {
 public:
 	void merge(vector<int>& nums1, int m, vector<int>& nums2, int n) {
 		vector<int> nums1_temp(m);
@@ -232,6 +232,60 @@ public:
 	}
 };
 // 
+//
+
+//Delete Item From an Array
+// 
+//删除操作，同样包含首尾和特定位置删除，需要挪动元素操作
+//
+
+//Given an integer array nums and an integer val, remove all occurrences of val in nums in-place. The relative order of the elements may be changed.
+// 
+//Example:
+//Input: nums = [3, 2, 2, 3], val = 3
+//Output : 2, nums = [2, 2, _, _]
+//Explanation : Your function should return k = 2, with the first two elements of nums being 2.
+//It does not matter what you leave beyond the returned k(hence they are underscores).
+//
+class Solution3_1 {
+public:
+	int removeElement(vector<int>& nums, int val) {
+		//nums.erase(remove(nums.begin(), nums.end(), val), nums.end());
+		//return nums.size();
+
+		int index = 0;
+		for (int i = 0; i < nums.size(); ++i)
+			if (nums[i] != val)
+				nums[index++] = nums[i];
+		return index;
+	}
+};
+// 
+//
+
+//Given an integer array nums sorted in non-decreasing order, remove the duplicates in-place such that each unique element appears only once.
+// The relative order of the elements should be kept the same.
+//
+//Example:
+//Input: nums = [0,0,1,1,1,2,2,3,3,4]
+//Output: 5, nums = [0, 1, 2, 3, 4, _, _, _, _, _]
+//Explanation : Your function should return k = 5, with the first five elements of nums being 0, 1, 2, 3, and 4 respectively.
+//It does not matter what you leave beyond the returned k(hence they are underscores).
+// 
+class Solutions3_2 {
+public:
+	int removeDuplicates(vector<int>& nums) {
+		int size = nums.size();
+		if (size == 0 || size == 1)
+			return size;
+		int index = 1;
+		for (int i = 1; i < nums.size(); ++i)
+			if (nums[i] != nums[i - 1])
+				nums[index++] = nums[i];
+		return index;
+	}
+};
+//
 //
 
 int main()
