@@ -288,6 +288,81 @@ public:
 //
 //
 
+//Searching for Items in an Array
+// 
+//最基本的是遍历，线性查找
+//
+//对于有序数组，可以使用二分查找
+//
+
+//Given an array arr of integers, check if there exists two integers N and M such that N is the double of M ( i.e. N = 2 * M).
+//
+//Example:
+//Input: arr = [10,2,5,3]
+//Output: true
+//Explanation : N = 10 is the double of M = 5, that is, 10 = 2 * 5.
+// 
+class Solution4_1 {
+public:
+	bool checkIfExist(vector<int>& arr) {
+		//暴力解
+		for (int i = 0; i < arr.size(); ++i)
+			for (int j = i + 1; j < arr.size(); ++j)
+				if (arr[i] * 2 == arr[j] || arr[j] * 2 == arr[i])
+					return true;
+		return false;
+		//感觉也没有什么别的好方法
+	}
+};
+//
+//
+
+//Given an array of integers arr, return true if and only if it is a valid mountain array.
+// 
+//Recall that arr is a mountain array if and only if:
+// arr.length >= 3
+// There exists some i with 0 < i < arr.length - 1 such that :
+//  arr[0] < arr[1] < ... < arr[i - 1] < arr[i]
+//  arr[i] > arr[i + 1] > ... > arr[arr.length - 1]
+// 
+//Exapmle:
+//Input: arr = [0,3,2,1]
+//Output: true
+// 
+class Solution4_2 {
+public:
+	bool validMountainArray(vector<int>& arr) {
+		int size = arr.size();
+		if (size < 3)
+			return false;
+		int mountain_top = 0;
+		for (int i = 0; i < size - 1; ++i) {
+			if (arr[i] == arr[i + 1]) return false;
+			if (arr[i] > arr[i + 1]) {
+				mountain_top = i;
+				break;
+			}
+		}
+		if (mountain_top == size - 1 || mountain_top == 0) return false;
+		for (int i = mountain_top; i < size - 1; ++i)
+			if (arr[i] <= arr[i + 1])
+				return false;
+		return true;
+
+		//其他解法，符合结果的做标记，如果一直检测到了最后一个元素，则是正确的
+		int N = arr.size();
+		int i = 0;
+
+		while (i + 1 < N && arr[i] < arr[i + 1]) i++;
+		if (i == 0 || i == N - 1) return false;
+		while (i + 1 < N && arr[i] > arr[i + 1]) i++;
+
+		return i == N - 1;
+	}
+};
+// 
+//
+
 int main()
 {
 	test_dvd_arr();
