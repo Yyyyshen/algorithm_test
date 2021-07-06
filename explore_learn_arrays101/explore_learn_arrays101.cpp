@@ -363,6 +363,110 @@ public:
 // 
 //
 
+//In-Place Operations
+// 
+//直接在给定数组内操作可以降低空间复杂度
+//
+
+//Given an array arr, replace every element in that array with the greatest element among the elements to its right, and replace the last element with -1.
+// 
+//Example:
+//Input: arr = [17,18,5,4,6,1]
+//Output: [18, 6, 6, 6, 1, -1]
+//Explanation :
+//	-index 0 -- > the greatest element to the right of index 0 is index 1 (18).
+//	- index 1 -- > the greatest element to the right of index 1 is index 4 (6).
+//	- index 2 -- > the greatest element to the right of index 2 is index 4 (6).
+//	- index 3 -- > the greatest element to the right of index 3 is index 4 (6).
+//	- index 4 -- > the greatest element to the right of index 4 is index 5 (1).
+//	- index 5 -- > there are no elements to the right of index 5, so we put - 1.
+//
+class Solution5_1 {
+public:
+	vector<int> replaceElements(vector<int>& arr) {
+		//暴力解，嵌套遍历
+		int size = arr.size();
+		for (int i = 0; i < size - 1; ++i) {
+			int rmax = 0;
+			for (int j = i + 1; j < size; ++j)
+			{
+				if (rmax < arr[j])
+					rmax = arr[j];
+			}
+			arr[i] = rmax;
+		}
+		arr[size - 1] = -1;
+		return arr;
+
+		//由于是找每个元素右边最大的，所以反过来想，从后往前遍历，则不需要嵌套
+		int maxItem = -1;
+		for (int i = arr.size() - 1; i > -1; --i)
+		{
+			int currentItemVal = arr[i];
+			arr[i] = maxItem;
+
+			if (maxItem < currentItemVal)
+			{
+				maxItem = currentItemVal;
+			}
+		}
+		return arr;
+	}
+};
+// 
+//
+
+//Given an integer array nums, move all 0's to the end of it while maintaining the relative order of the non-zero elements.
+// 
+//Example:
+//Input: nums = [0,1,0,3,12]
+//Output: [1, 3, 12, 0, 0]
+// 
+class Solution5_2 {
+public:
+	void moveZeroes(vector<int>& nums) {
+		int size = nums.size();
+		if (size == 0 || size == 1) return;
+		int index = 0;
+		for (int i = 0; i < size; ++i) {
+			if (nums[i] != 0)
+				nums[index++] = nums[i];
+		}
+		for (int i = index; i < size; ++i)
+			nums[i] = 0;
+	}
+};
+// 
+//
+
+//Given an array nums of non-negative integers, return an array consisting of all the even elements of nums, followed by all the odd elements of nums.
+// 
+//Example:
+//Input: nums = [3,1,2,4]
+//Output: [2, 4, 3, 1]
+//The outputs[4, 2, 3, 1], [2, 4, 1, 3], and [4, 2, 1, 3] would also be accepted.
+// 
+class Solution5_3 {
+public:
+	vector<int> sortArrayByParity(vector<int>& nums) {
+		int size = nums.size();
+		if (size == 0 || size == 1) return nums;
+		int left = 0, right = 0;
+		for (; right < size;) {
+			if (nums[right] % 2 == 1) ++right;
+			else
+			{
+				swap(nums[left], nums[right]);//记得在看STL时，有个说法是，在某些算法中不能用前后置式的++/--，因为不一定只调用一次。忘记具体式哪个算法了，所以干脆不要这么写了
+				++left;
+				++right;
+			}
+		}
+		return nums;
+	}
+};
+//
+//
+
 int main()
 {
 	test_dvd_arr();
