@@ -467,6 +467,94 @@ public:
 //
 //
 
+//Conclusion
+// 
+//最后做几个练习
+//
+
+//给定数组，排序后返回有几个位置与原数组不同
+// 
+//Example:
+//Input: heights = [1, 1, 4, 2, 1, 3]
+//Output : 3
+//Explanation :
+//	heights : [1, 1, 4, 2, 1, 3]
+//	expected : [1, 1, 1, 2, 3, 4]
+//	Indices 2, 4, and 5 do not match.
+// 
+class Solution {
+public:
+	int heightChecker(vector<int>& heights) {
+		int size = heights.size();
+		if (size == 1 || size == 0) return 0;
+		vector<int> heights_temp(heights.begin(), heights.end());
+		sort(heights_temp.begin(), heights_temp.end());
+		int ret = 0;
+		for (int i = 0; i < size; ++i)
+			if (heights[i] != heights_temp[i])
+				++ret;
+		return ret;
+	}
+};
+// 
+//
+
+//Given integer array nums, return the third maximum number in this array. If the third maximum does not exist, return the maximum number.
+// 
+//Example:
+//Input: nums = [3,2,1]
+//Output: 1
+//Explanation : The third maximum is 1.
+// 
+class Solution {
+public:
+	int thirdMax(vector<int>& nums) {
+		int size = nums.size();
+		if (size == 0) return 0;
+		if (size == 1) return nums[0];
+		if (size == 2) return nums[0] > nums[1] ? nums[0] : nums[1];
+
+		sort(nums.begin(), nums.end());
+		int i = size - 1, j = 1;
+		for (; j < 3 && i > 0; --i)
+			if (nums[i] != nums[i - 1])
+				++j;
+		if (j == 3)
+			return nums[i];
+		return nums[size - 1];
+
+	}
+};
+//
+//
+
+//Given an array nums of n integers where nums[i] is in the range [1, n], return an array of all the integers in the range [1, n] that do not appear in nums.
+// 
+//Example:
+//Input: nums = [4,3,2,7,8,2,3,1]
+//Output: [5, 6]
+// 
+class Solution {
+public:
+	vector<int> findDisappearedNumbers(vector<int>& nums) {
+		int size = nums.size();
+		vector<int> tags(size);
+		for (int i = 0; i < size; ++i) {
+			int num = nums[i];
+			if (num <= size)
+				tags[num - 1] = 1;
+		}
+		vector<int> ret;
+		for (int i = 0; i < size; ++i)
+			if (tags[i] == 0)
+				ret.push_back(i + 1);
+		return ret;
+	}
+};
+//
+//
+
+
 int main()
 {
 	test_dvd_arr();
