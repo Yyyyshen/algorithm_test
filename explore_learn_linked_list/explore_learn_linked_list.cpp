@@ -108,16 +108,40 @@ private:
 	SinglyListNode* head;//还可以使用两个指针分别记录头和尾，在尾操作时会快很多
 };
 
-/**
- * Your MyLinkedList object will be instantiated and called as such:
- * MyLinkedList* obj = new MyLinkedList();
- * int param_1 = obj->get(index);
- * obj->addAtHead(val);
- * obj->addAtTail(val);
- * obj->addAtIndex(index,val);
- * obj->deleteAtIndex(index);
- */
- //
+//Two-Pointer in Linked List
+// 
+//检测链表是否有环，可以使用此技术
+// 定义两个指针，移动速度不同
+// 如果有环，快的会追上慢的
+// 
+struct ListNode {
+	int val;
+	ListNode* next;
+	ListNode(int x) : val(x), next(NULL) {}
+};
+class Solution2_1 {
+public:
+	bool hasCycle(ListNode* head) {
+		ListNode* temp1 = head;
+		if (temp1 == nullptr) return false;
+		ListNode* temp2 = head->next;
+		if (temp2 == nullptr) return false;
+		while ( /* temp1 != nullptr && */ temp2 != nullptr && temp2->next != nullptr) { //快的不为空就可以保证慢的不为空了，第一个条件可以省略
+			if (temp1 == temp2) return true;
+			temp1 = temp1->next;
+			temp2 = temp2->next->next;
+		}
+		return false;
+	}
+};
+class Solution2_2 {
+public:
+	ListNode* detectCycle(ListNode* head) {
+
+	}
+};
+// 
+//
 
 
 int main()
