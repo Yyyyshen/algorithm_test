@@ -117,7 +117,9 @@ private:
 struct ListNode {
 	int val;
 	ListNode* next;
-	ListNode(int x) : val(x), next(NULL) {}
+	ListNode() : val(0), next(nullptr) {}
+	ListNode(int x) : val(x), next(nullptr) {}
+	ListNode(int x, ListNode* next) : val(x), next(next) {}
 };
 class Solution2_1 {
 public:
@@ -137,10 +139,156 @@ public:
 class Solution2_2 {
 public:
 	ListNode* detectCycle(ListNode* head) {
+		if (head == NULL || head->next == NULL) return NULL;
 
+		ListNode* slow = head;
+		ListNode* fast = head;
+
+		while (fast->next != NULL && fast->next->next != NULL)
+		{
+			slow = slow->next;
+			fast = fast->next->next;
+			if (slow == fast) //直接break在外面写下面的逻辑，可以减少嵌套
+			{
+				//汇合的话，把快的重新指向头（或者找一个指向头的temp点）；快慢指针汇合点和头同时走会汇合在环开始的点（？）
+				fast = head;
+				while (slow != fast)
+				{
+					slow = slow->next;
+					fast = fast->next;
+				}
+				return slow;
+			}
+		}
+		/*
+
+		Explnation:
+		Let's say that linked list is of form
+		L + circumference
+
+		slowPtr moves L+x and fastPtr moves L+x+circumference
+
+		Since fast ptr moves twice as slowPtr
+		2*(L+x) = (L+x)+circumference
+		=> L+x = circumference
+		=> L = circumference- x
+
+		Now if we set slowPtr to head
+		it has to move L steps to point where loop starts and the fastPtr has to move circumference -x steps
+		because they both have to move same steps to reach the point where loop starts, we can just move them by one step at a time and compare if they are equal.
+
+		and fastPtr has to move circumference-
+
+		*/
+		return NULL;
 	}
 };
 // 
+//
+
+//Intersection of Two Linked Lists
+// 
+//Given the heads of two singly linked-lists headA and headB, return the node at which the two lists intersect.
+// If the two linked lists have no intersection at all, return null.
+// 
+//Example:
+//Input: intersectVal = 8, listA = [4,1,8,4,5], listB = [5,6,1,8,4,5], skipA = 2, skipB = 3
+//Output: Intersected at '8'
+//Explanation : The intersected node's value is 8 (note that this must not be 0 if the two lists intersect).
+//From the head of A, it reads as[4, 1, 8, 4, 5].From the head of B, it reads as[5, 6, 1, 8, 4, 5].
+//There are 2 nodes before the intersected node in A; There are 3 nodes before the intersected node in B.
+// 
+class Solution2_3 {
+public:
+
+	int length(ListNode* head) {
+		if (head == NULL)
+			return 0;
+		ListNode* ptr = head;
+		int count = 0;
+		while (ptr->next != NULL) {
+			ptr = ptr->next;
+			count++;
+		}
+		return count;
+	}
+
+	ListNode* getIntersectionNode(ListNode* headA, ListNode* headB) {
+		int l1 = length(headA);
+		int l2 = length(headB);
+		int d = 0;
+		//先计算两链表的长度
+		ListNode* ptr1;
+		ListNode* ptr2;
+
+		if (l1 > l2) {
+			d = l1 - l2;
+			ptr1 = headA;
+			ptr2 = headB;
+		}
+		else {
+			d = l2 - l1;
+			ptr1 = headB;
+			ptr2 = headA;
+		}
+		//根据两链表长度调整两个对比点
+		while (d) {
+			ptr1 = ptr1->next;
+			if (ptr1 == NULL)
+				return NULL;
+			d--;
+		}
+		//调整后两点距离表尾距离相同，只需要同时推进对比即可
+		while (ptr1 != NULL && ptr2 != NULL) {
+			if (ptr1 == ptr2) {
+				return ptr1;
+			}
+
+			ptr1 = ptr1->next;
+			ptr2 = ptr2->next;
+		}
+
+		return NULL;
+	}
+
+};
+// 
+//
+
+//Remove Nth Node From End of List
+// 
+class Solution2_4 {
+public:
+	ListNode* removeNthFromEnd(ListNode* head, int n) {
+		int position = 1;
+
+		ListNode* start = new ListNode();
+		start->next = head;
+
+		ListNode* slow = start;
+		ListNode* fast = start;
+
+		while (fast->next != NULL)
+		{
+			if (position > n)
+				slow = slow->next;
+
+			fast = fast->next;
+			position++;
+		}
+
+		slow->next = slow->next->next;
+
+		return start->next;
+	}
+};
+//
+//
+
+//两点法总结
+// 
+//在使用next节点前，检查节点是否为空
+//仔细定义循环条件
 //
 
 
