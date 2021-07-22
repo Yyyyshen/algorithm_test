@@ -291,6 +291,109 @@ public:
 //仔细定义循环条件
 //
 
+//Classic Problems
+// 
+//一些经典问题
+//
+
+//Reverse Linked List
+// 
+//Example:
+//Input: head = [1,2,3,4,5]
+//Output: [5, 4, 3, 2, 1]
+// 
+class Solution3_1 {
+public:
+	ListNode* reverseList(ListNode* head) {
+		ListNode* prev = NULL;
+		while (head != NULL) {
+			ListNode* next = head->next;
+			head->next = prev;
+			prev = head;//遍历每个节点，把当前节点放到前一个节点的前面去
+			head = next;
+		}
+		return prev;
+	}
+};
+// 
+//
+
+//Remove Linked List Elements
+// 
+//Given the head of a linked list and an integer val, remove all the nodes of the linked list that has Node.val == val, and return the new head.
+// 
+class Solution3_2 {
+public:
+	ListNode* removeElements(ListNode* head, int val) {
+		if (head == NULL) return NULL;
+		ListNode* p = head;
+		while (p->next != NULL)
+		{
+			//先不管头，后面的符合条件节点删除
+			if (p->next->val == val)
+				p->next = p->next->next;
+			else
+				p = p->next;
+		}
+		//最后看头是不是也符合
+		if (head->val == val)
+			head = head->next;
+		return head;
+	}
+};
+// 
+//
+
+//Odd Even Linked List
+// 
+//Given the head of a singly linked list, group all the nodes with odd indices together followed by the nodes with even indices, and return the reordered list.
+//
+class Solution3_3 {
+public:
+	ListNode* oddEvenList(ListNode* head) {
+		if (!head) return head;
+		ListNode* odd = head, * evenhead = head->next, * even = evenhead;
+		while (even && even->next)
+		{
+			//奇偶分别串起来
+			odd->next = odd->next->next;
+			even->next = even->next->next;
+			odd = odd->next;
+			even = even->next;
+		}
+		//两链相连
+		odd->next = evenhead;
+		return head;
+	}
+};
+//
+//
+
+//Palindrome Linked List
+// 
+//Given the head of a singly linked list, return true if it is a palindrome.
+// 
+class Solution3_4 {
+public:
+	bool isPalindrome(ListNode* head) {
+		ListNode* slow = head, * fast = head, * prev, * temp;
+		while (fast && fast->next)
+			slow = slow->next, fast = fast->next->next;
+		//用两点法将链表分割开，反转后半部分，之后对比两部分链表是否相同
+		prev = slow, slow = slow->next, prev->next = NULL;
+		while (slow)
+			temp = slow->next, slow->next = prev, prev = slow, slow = temp;
+		fast = head, slow = prev;
+		while (slow)
+			if (fast->val != slow->val) return false;
+			else fast = fast->next, slow = slow->next;
+		return true;
+	}
+};
+// 
+//
+
+
 
 int main()
 {
