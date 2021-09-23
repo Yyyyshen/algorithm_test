@@ -10,7 +10,7 @@ static const uint8_t byte_dictionary[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05,
 0x06, 0x07, 0x08, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 
 inline
-std::string 
+std::string
 bytes2hex(const uint8_t* bytes, int length)
 {
 	std::stringstream ss;
@@ -23,7 +23,7 @@ bytes2hex(const uint8_t* bytes, int length)
 }
 
 inline
-uint8_t* 
+uint8_t*
 hex2bytes(std::string hex)
 {
 	uint8_t* bytes = new uint8_t(hex.size() / 2);
@@ -40,7 +40,7 @@ hex2bytes(std::string hex)
  */
 
 inline
-std::string 
+std::string
 random_str(uint8_t length)
 {
 	std::string ret;
@@ -55,4 +55,15 @@ random_str(uint8_t length)
 		ret += alphanum[rand() % (sizeof(alphanum) - 1)];
 
 	return ret;
+}
+
+inline
+void
+str2num(const std::string& str)
+{
+	int str_len = str.length();
+	for (int i = 0; i < str_len; i++)
+	{
+		std::cout << (unsigned short)str[i] << std::endl;
+	}
 }

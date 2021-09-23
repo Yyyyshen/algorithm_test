@@ -12,13 +12,20 @@
  */
 void test_func1();//字节转换测试
 void test_func2();//随机字串生成测试
+void test_func3();//字符串转数字
 
 int main()
 {
 	//test_func1();
-	test_func2();
+	//test_func2();
+	test_func3();
 	system("pause");
 	return 0;
+}
+
+void test_func3() {
+	std::string test_str("I LOVE THREE THINGS IN THE WORLD:CODE,BIKE AND LL.");
+	str2num(test_str);
 }
 
 void test_func2()

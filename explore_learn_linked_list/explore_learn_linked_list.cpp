@@ -393,7 +393,15 @@ public:
 // 
 //
 
-
+//Doubly Linked List
+// 
+struct DoublyListNode {
+	int val;
+	DoublyListNode* next, * prev;
+	DoublyListNode(int x) : val(x), next(NULL), prev(NULL) {}
+};
+//
+//
 
 int main()
 {
