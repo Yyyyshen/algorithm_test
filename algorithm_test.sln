@@ -49,6 +49,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "explore_learn_arrays101", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "explore_learn_linked_list", "explore_learn_linked_list\explore_learn_linked_list.vcxproj", "{54373289-7EFB-45EB-BA93-F5F634E26F58}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "explore_learn_array_and_string", "explore_learn_array_and_string\explore_learn_array_and_string.vcxproj", "{64722784-6C9F-4087-BACC-1B755CC864E0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -209,6 +211,14 @@ Global
 		{54373289-7EFB-45EB-BA93-F5F634E26F58}.Release|x64.Build.0 = Release|x64
 		{54373289-7EFB-45EB-BA93-F5F634E26F58}.Release|x86.ActiveCfg = Release|Win32
 		{54373289-7EFB-45EB-BA93-F5F634E26F58}.Release|x86.Build.0 = Release|Win32
+		{64722784-6C9F-4087-BACC-1B755CC864E0}.Debug|x64.ActiveCfg = Debug|x64
+		{64722784-6C9F-4087-BACC-1B755CC864E0}.Debug|x64.Build.0 = Debug|x64
+		{64722784-6C9F-4087-BACC-1B755CC864E0}.Debug|x86.ActiveCfg = Debug|Win32
+		{64722784-6C9F-4087-BACC-1B755CC864E0}.Debug|x86.Build.0 = Debug|Win32
+		{64722784-6C9F-4087-BACC-1B755CC864E0}.Release|x64.ActiveCfg = Release|x64
+		{64722784-6C9F-4087-BACC-1B755CC864E0}.Release|x64.Build.0 = Release|x64
+		{64722784-6C9F-4087-BACC-1B755CC864E0}.Release|x86.ActiveCfg = Release|Win32
+		{64722784-6C9F-4087-BACC-1B755CC864E0}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -232,6 +242,7 @@ Global
 		{88897917-A241-4FC9-B469-C23D9269450C} = {A7171425-6D13-44EC-9BF1-5BD6088A3D8B}
 		{39D8F580-1742-4C0B-8804-4BF47E6A8C4A} = {3441E660-B245-454C-8C10-2C49922C173F}
 		{54373289-7EFB-45EB-BA93-F5F634E26F58} = {3441E660-B245-454C-8C10-2C49922C173F}
+		{64722784-6C9F-4087-BACC-1B755CC864E0} = {3441E660-B245-454C-8C10-2C49922C173F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C268B8F3-3579-487E-852E-000EEF225BF5}
