@@ -42,7 +42,7 @@ public:
 
 	/** Get the value of the index-th node in the linked list. If the index is invalid, return -1. */
 	int get(int index) {
-		if (index > size - 1 || index < 0) return -1;
+		if (index > size - 1 || index < 0 || head == nullptr) return -1;
 		SinglyListNode* temp = head;
 		for (int i = 0; i < index; ++i)
 			temp = temp->next;
@@ -401,7 +401,105 @@ struct DoublyListNode {
 	DoublyListNode(int x) : val(x), next(NULL), prev(NULL) {}
 };
 //
+
+//Conclusion
+// 
+//总结和一些练习
 //
+
+//Merge two sorted linked lists and return it as a sorted list.
+//  The list should be made by splicing together the nodes of the first two lists.
+//
+class Solution5_1 {
+public:
+	ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+		if (l1 == nullptr) return l2;
+		if (l2 == nullptr) return l1;
+		ListNode* newList = new ListNode;
+		ListNode* head = newList;
+		l2->val > l1->val ? newList->val = l1->val : newList->val = l2->val;
+		l2->val > l1->val ? l1 = l1->next : l2 = l2->next;
+		while (l1 != nullptr && l2 != nullptr)
+		{
+			if (l2->val > l1->val)
+			{
+				newList->next = new ListNode(l1->val);
+				l1 = l1->next;
+			}
+			else {
+				newList->next = new ListNode(l2->val);
+				l2 = l2->next;
+			}
+			newList = newList->next;
+		}
+		while (l1 != nullptr)
+		{
+			newList->next = new ListNode(l1->val);
+			l1 = l1->next;
+			newList = newList->next;
+		}
+		while (l2 != nullptr)
+		{
+			newList->next = new ListNode(l2->val);
+			l2 = l2->next;
+			newList = newList->next;
+		}
+		return head;
+	}
+};
+
+//You are given two non-empty linked lists representing two non-negative integers. 
+// The digits are stored in reverse order, and each of their nodes contains a single digit. 
+// Add the two numbers and return the sum as a linked list.
+//
+class Solution5_2 {
+public:
+	ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+		if (l1 == nullptr) return l2;
+		if (l2 == nullptr) return l1;
+		int val = 0, carry = 0;
+		val = (l1->val + l2->val) % 10;
+		carry = (l1->val + l2->val) / 10;
+		ListNode* newList = new ListNode(val);
+		ListNode* head = newList;
+		l1 = l1->next;
+		l2 = l2->next;
+		while (l1 != nullptr && l2 != nullptr)
+		{
+			int num = l1->val + l2->val + carry;
+			val = num % 10;
+			carry = num / 10;
+			newList->next = new ListNode(val);
+			newList = newList->next;
+			l1 = l1->next;
+			l2 = l2->next;
+		}
+		while (l1 != nullptr)
+		{
+			int num = l1->val + carry;
+			val = num % 10;
+			carry = num / 10;
+			newList->next = new ListNode(val);
+			newList = newList->next;
+			l1 = l1->next;
+		}
+		while (l2 != nullptr)
+		{
+			int num = l2->val + carry;
+			val = num % 10;
+			carry = num / 10;
+			newList->next = new ListNode(val);
+			newList = newList->next;
+			l2 = l2->next;
+		}
+		if (carry != 0)
+		{
+			newList->next = new ListNode(carry);
+		}
+		return head;
+	}
+};
+
 
 int main()
 {
