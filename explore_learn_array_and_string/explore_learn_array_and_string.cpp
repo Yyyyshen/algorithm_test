@@ -203,7 +203,7 @@ public:
 
 			}
 		}
-
+		//由于只+1，所以进位也不复杂
 		digits.push_back(0);
 		digits[0] = 1;
 		return digits;
@@ -212,9 +212,127 @@ public:
 // 
 //
 
+//二维数组
+// 
+template <size_t n, size_t m>
+void print_2d_array(int(&a)[n][m]) {
+	for (int i = 0; i < n; ++i) {
+		for (int j = 0; j < m; ++j) {
+			cout << a[i][j] << " ";
+		}
+		cout << endl;
+	}
+}
+void test_2d_arr()
+{
+	cout << "Example I:" << endl;
+	int a[2][5];
+	print_2d_array(a);
+	cout << "Example II:" << endl;
+	int b[2][5] = { {1, 2, 3} };
+	print_2d_array(b);
+	cout << "Example III:" << endl;
+	int c[][5] = { 1, 2, 3, 4, 5, 6, 7 };
+	print_2d_array(c);
+	/* 自动换行（C++其实是以一整个一维数组来存储的二位数组）
+		1 2 3 4 5
+		6 7 0 0 0
+	*/
+	cout << "Example IV:" << endl;
+	int d[][5] = { {1, 2, 3, 4}, {5, 6}, {7} };
+	print_2d_array(d);
+}
+// 
+//
+
+//Given an m x n matrix mat, return an array of all the elements of the array in a diagonal order.
+// 
+class Solution2_1 {
+public:
+	vector<int> findDiagonalOrder(vector<vector<int>>& mat) {
+		//分解来做，先只考虑单方向对角线，再隔行反转
+		// Check for empty matrices
+		if (mat.size() == 0) return vector<int>();
+
+		// Variables to track the size of the matrix
+		int N = mat.size();
+		int M = mat[0].size();
+
+		// The two arrays as explained in the algorithm
+		vector<int> result;
+		int k = 0;
+
+		// We have to go over all the elements in the first
+		// row and the last column to cover all possible diagonals
+		for (int d = 0; d < N + M - 1; d++) {
+
+			// Clear the intermediate array every time we start
+			// to process another diagonal
+			vector<int> intermediate;
+
+			// We need to figure out the "head" of this diagonal
+			// The elements in the first row and the last column
+			// are the respective heads.
+			int r = d < M ? 0 : d - M + 1;
+			int c = d < M ? d : M - 1;
+
+			// Iterate until one of the indices goes out of scope
+			// Take note of the index math to go down the diagonal
+			while (r < N && c > -1) {
+
+				intermediate.push_back(mat[r][c]);
+				++r;
+				--c;
+			}
+
+			// Reverse even numbered diagonals. The
+			// article says we have to reverse odd 
+			// numbered articles but here, the numbering
+			// is starting from 0 :P
+			if (d % 2 == 0) {
+				reverse(intermediate.begin(),intermediate.end());
+			}
+
+			for (int i = 0; i < intermediate.size(); i++) {
+				result.push_back(intermediate[i]);
+			}
+		}
+		return result;
+	}
+};
+// 
+//
+
+//字符串
+// 
+// A string is actually an array of unicode characters
+// 
+void test_string()
+{
+	string s1 = "Hello World";
+	cout << "s1 is \"Hello World\"" << endl;
+	string s2 = s1;
+	cout << "s2 is initialized by s1" << endl;
+	string s3(s1);
+	cout << "s3 is initialized by s1" << endl;
+	// compare by '==' C++可以重载运算符，所以不同于JAVA
+	cout << "Compared by '==':" << endl;
+	cout << "s1 and \"Hello World\": " << (s1 == "Hello World") << endl;
+	cout << "s1 and s2: " << (s1 == s2) << endl;
+	cout << "s1 and s3: " << (s1 == s3) << endl;
+	// compare by 'compare'
+	cout << "Compared by 'compare':" << endl;
+	cout << "s1 and \"Hello World\": " << !s1.compare("Hello World") << endl;
+	cout << "s1 and s2: " << !s1.compare(s2) << endl;
+	cout << "s1 and s3: " << !s1.compare(s3) << endl;
+}
+// 
+//
+
 int main()
 {
 	std::cout << "Hello World!\n";
 	test_arr();
 	test_vec();
+	test_2d_arr();
 }
