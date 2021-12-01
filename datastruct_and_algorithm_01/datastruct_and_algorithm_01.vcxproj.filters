@@ -19,4 +19,8 @@
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="规划.txt" />
+    <Text Include="思考.txt" />
+  </ItemGroup>
 </Project>
