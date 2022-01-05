@@ -112,7 +112,205 @@
 // 也就是每个节点存在于两条链中，双链表用于处理缓存的淘汰时间，每个槽位的拉链用于快速查找节点位置
 //
 
+
+
+//
+//树
+// 
+//基本概念
+// 高度 节点到叶子节点的最长路径（边数）
+// 深度 根节点到节点的边个数
+// 层数 深度+1（跟深度同理，但深度从0开始，而层数从1开始计数）
+// 
+//二叉树
+// 每个节点最多有两个子节点
+// 满二叉树 除叶子节点之外，每个节点都有两个子节点
+// 完全二叉树 除最后一层之外都是满的，并且最后一层叶子节点是从左到右依次连续存在的（用数组表示树时更节约空间）
+// 
+//存储方式
+// 链式
+// 每个节点用三个字段，分别是数据、左子节点指针和右子节点指针
+// 数组
+// 将根节点存储在索引为 i=1 的位置，左子节点为 2i ，右子节点为 2i+1 
+// 
+//遍历
+// 前序 对任意节点开始，先操作自身，然后是左子树，最后右子树（根-》左-》右）
+// 中序 先左子树，再自身，最后右子树（左-》根-》右）
+// 后序 先左子树，再右子树，最后是自身（左-》右-》根）
+/* 遍历通用伪代码模板，递归思想，时间复杂度O(n)
+
+void tree_order(Node* root)
+{
+	if (root == nullptr) return;
+
+							   // 《—— do_something(root); 对当前节点的操作（如printf）插在这里就是前序遍历
+	tree_order(root->left);    // 递归操作左子树
+							   // 《—— 对当前节点的操作插在这里就是中序遍历
+	tree_order(root->right);   // 递归操作右子树
+							   // 《—— 对当前节点的操作插在这里就是后序遍历
+}
+
+*/
+// 
+//二叉搜索树
+// 树中任意节点左子树每个节点值都小于此节点值，右子树节点都大于这个节点值
+class tree_node {
+public:
+	tree_node(int data)
+		: m_data(data),
+		m_left(nullptr),
+		m_right(nullptr)
+	{}
+
+public:
+	int m_data;
+	tree_node* m_left;
+	tree_node* m_right;
+};
+class binary_search_tree {
+public:
+	using node_type = tree_node;
+	using data_type = int;
+public:
+	//查找操作，根据特性，像是二分查找
+	//小于当前节点往左子树找，大于往右找，相等找到，没找但返回空
+	node_type* find(data_type value)
+	{
+		if (root == nullptr) return nullptr;//不判空也行，后面逻辑带判空
+
+		node_type* temp = root;
+		while (temp != nullptr)
+		{
+			if (temp->m_data == value)
+				return temp;
+			else if (temp->m_data > value)
+				temp = temp->m_left;
+			else
+				temp = temp->m_right;
+		}
+		return nullptr;
+	}
+	//插入操作，也涉及查找的过程，先需要查找插入位置
+	//大于一个节点往右插，小于往左插，直到找到一个空节点
+	void insert(data_type value)
+	{
+		if (root == nullptr)
+		{
+			root = new node_type(value);
+			return;//空树直接作为根节点插入
+		}
+
+		node_type* temp = root;
+		while (temp)
+		{
+			if (temp->m_data < value)
+			{
+				//新节点值大于当前节点，判断右子节点是否为空，是则插入
+				if (temp->m_right == nullptr)
+				{
+					temp->m_right = new node_type(value);
+					return;
+				}
+				//不为空继续找
+				temp = temp->m_right;
+			}
+			else
+			{
+				if (temp->m_left == nullptr)
+				{
+					temp->m_left = new node_type(value);
+					return;
+				}
+
+				temp = temp->m_left;
+			}
+		}
+	}
+	//删除操作，三种情况
+	void delete_node(data_type value)
+	{
+		node_type* temp = root, * parent = nullptr;
+		//第一步，找到要删除的节点
+		while (temp != nullptr && temp->m_data != value)
+		{
+			parent = temp;//记录父节点
+			if (value <= temp->m_data)
+				temp = temp->m_left;
+			else
+				temp = temp->m_right;
+		}
+		//没找到，直接返回
+		if (temp == nullptr) return;
+		//最复杂的情况，删除的节点有两个子节点
+		if (temp->m_left != nullptr && temp->m_right != nullptr)
+		{
+			//需要在右子树找最小节点，因为右子树min>左子树max，是最适合作为左子树新的父节点的
+			node_type* min = temp->m_right, * minp = temp;//记录右子树最小节点和最小节点的父节点
+			//找最小，一路向左找
+			while (min->m_left)
+			{
+				minp = min;
+				min = min->m_left;
+			}
+			//最小节点值替换到原本要删除的位置
+			temp->m_data = min->m_data;
+			//删除位置改变，复杂情况退化成删除叶子节点
+			temp = min;
+			parent = minp;
+		}
+
+		//第二种，删除的节点是叶子节点，或只有一个子节点，则把子节点接到父节点上
+		node_type* child;//若有子节点，记录
+		if (temp->m_left) child = temp->m_left;
+		else if (temp->m_right) child = temp->m_right;
+		else child = nullptr;
+		
+		//最后判断下删除的是不是根节点
+		if (parent == nullptr)
+			root = child;//nullptr
+		//调整要删除节点的父节点
+		else if (parent->m_left == temp)
+			parent->m_left = child;
+		else
+			parent->m_right = child;
+
+		//删除节点
+		delete temp;
+	}
+
+	//其他操作
+	//快速查询最大最小节点，则是向右或向左遍历到底
+	//前驱后继节点，则是左子树向右遍历到底或右子树向左遍历到底
+
+	//特性
+	//中序遍历，可以输出一个有序数据序列，时间复杂度O(n)
+
+private:
+	node_type* root;
+};
+// 
+//支持重复数据的二叉搜索树
+// 对于节点值重复的节点，一个办法是通过链表或动态扩容数组等存在一个节点上，但不优雅
+// 另一种方法是
+// 若相同，当作大于此重复节点的节点，也就是当作后继节点插入
+// 在查找时，找到相同的节点时不停止，而是直到遇到叶子节点才停止，就找到了所有相同值节点
+// 删除同理
+// 
+//时间复杂度分析
+// 极端情况，构建树时，全都偏向一边，则退化成链表，查找复杂度变成O(n)
+// 在较均衡（平衡二叉树、完全二叉树、满二叉树等）情况下，树高度接近logn，则操作的时间复杂度也为O(logn)
+// 
+//与散列表的对比
+// 散列表各操作能做到O(1)为什么还需要二叉树
+//	在需要排序的数据中，二叉树只要中序遍历便是有序的，而散列表时无序存储，需要自己排序
+//	散列表扩容、散列冲突情况下，性能不够稳定；而平时使用的树一般是平衡的，较稳定
+//	哈希冲突的存在，使得常量级的操作并不一定比logn小，实际速度也不一定比树快
+//	散列表结构要更复杂，设计上要考虑的更多；而树只需要做好平衡这一点就可以适应大部分情况
+//	装载因子的存在使得散列表中总是有一部分空间是浪费的
+// 所以，要根据自己需求，选择数据结构
+//
+
 int main()
 {
-    std::cout << "Hello World!\n";
+	std::cout << "Hello World!\n";
 }
