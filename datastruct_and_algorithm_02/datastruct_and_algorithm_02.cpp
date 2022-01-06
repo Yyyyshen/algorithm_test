@@ -659,7 +659,83 @@ private:
 // 基于以上说法，极端情况下，如果哈希冲突大量发生，导致每个子串还是去逐字比较了，则退化为BF算法O(n*m)
 //
 
+
+
+//
+//Trie树
+// 
+//问题引入：搜索引擎的搜索关键词提示
+// 
+//字典树
+// 一个树形结构，专门处理字符串匹配，解决一组字符串中快速查找某字符串
+// 主要利用字符串之间的公共前缀，将重复的前缀合并
+// 
+//存储方式
+// 二叉树用带两个指针的节点存储，而对于这样的多叉树，则需要用一个数组
+// 例如用26个小写字母
+#define CHAR_SIZE 26
+class trie_node {
+public:
+	char data;
+	bool is_ending;//标记是否此处为一个单词结尾
+	trie_node* children[CHAR_SIZE] = { nullptr };//不初始化为空的话会默认按0值初始化所有指针
+	trie_node(char c) : data(c), is_ending(false) {}
+};
+class trie
+{
+public:
+	trie()
+	{
+		root = new trie_node('/');//根放一个无意义字符
+	}
+
+	void insert(char* text, size_t len)
+	{
+		trie_node* temp = root;
+		for (int i = 0; i < len; ++i)
+		{
+			int index = text[i] - 'a';//减a的ASCII码值则是算出0~25索引
+			if (temp->children[index] == nullptr)
+				//字符没匹配，则在此位置新建一个节点
+				temp->children[index] = new trie_node(text[i]);
+			temp = temp->children[index];
+		}
+		temp->is_ending = true;
+	}
+
+	bool find(char* text, size_t len)
+	{
+		trie_node* temp = root;
+		for (int i = 0; i < len; ++i)
+		{
+			int index = text[i] - 'a';
+			if (temp->children[index] == nullptr)
+				return false;//在重复路径上没有找到下一个字符了，则没找到
+			temp = temp->children[index];
+		}
+		if (temp->is_ending == false) 
+			return false;//虽然匹配，但只是前缀
+		else 
+			return true;//找到
+	}
+private:
+	trie_node* root;
+};
+// 
+//与散列表和红黑树比较
+// 字符集大会浪费很多空间，又比较复杂，并且虽然用数组，其实存放的是指针，跳跃性的内存访问对缓存不友好
+// 所以，字典树并不适合动态集合数据的查找
+// 一组字符串找字符串时，更倾向于散列表或者红黑树
+// trie一般只适合于开篇问题这类特定场景（还有输入法自动补全、IDE代码自动不全等）
+//
+
 int main()
 {
-	std::cout << "Hello World!\n";
+	trie_node* root = new trie_node('/');
+	for (int i = 0; i < 26; ++i)
+	{
+		if (root->children[i] == nullptr)
+			std::cout << 1 << std::endl;
+	}
+
 }
