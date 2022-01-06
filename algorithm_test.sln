@@ -71,6 +71,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "datastruct_and_algorithm_02
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "algorithm_interview_01", "algorithm_interview_01\algorithm_interview_01.vcxproj", "{109DA47A-52FC-4D9E-9FC2-92D826908BC3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "datastruct_and_algorithm_03", "datastruct_and_algorithm_03\datastruct_and_algorithm_03.vcxproj", "{5EC69F76-FD37-4F69-997A-D1280A26D1D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -303,6 +305,14 @@ Global
 		{109DA47A-52FC-4D9E-9FC2-92D826908BC3}.Release|x64.Build.0 = Release|x64
 		{109DA47A-52FC-4D9E-9FC2-92D826908BC3}.Release|x86.ActiveCfg = Release|Win32
 		{109DA47A-52FC-4D9E-9FC2-92D826908BC3}.Release|x86.Build.0 = Release|Win32
+		{5EC69F76-FD37-4F69-997A-D1280A26D1D7}.Debug|x64.ActiveCfg = Debug|x64
+		{5EC69F76-FD37-4F69-997A-D1280A26D1D7}.Debug|x64.Build.0 = Debug|x64
+		{5EC69F76-FD37-4F69-997A-D1280A26D1D7}.Debug|x86.ActiveCfg = Debug|Win32
+		{5EC69F76-FD37-4F69-997A-D1280A26D1D7}.Debug|x86.Build.0 = Debug|Win32
+		{5EC69F76-FD37-4F69-997A-D1280A26D1D7}.Release|x64.ActiveCfg = Release|x64
+		{5EC69F76-FD37-4F69-997A-D1280A26D1D7}.Release|x64.Build.0 = Release|x64
+		{5EC69F76-FD37-4F69-997A-D1280A26D1D7}.Release|x86.ActiveCfg = Release|Win32
+		{5EC69F76-FD37-4F69-997A-D1280A26D1D7}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -335,6 +345,7 @@ Global
 		{994A6E98-EE36-46E3-BF11-7DA488C4B66D} = {A884D726-69BD-46FD-82B5-B1F6195B43E6}
 		{86E586B5-A764-4EAF-8226-92FAA5113976} = {A884D726-69BD-46FD-82B5-B1F6195B43E6}
 		{109DA47A-52FC-4D9E-9FC2-92D826908BC3} = {A884D726-69BD-46FD-82B5-B1F6195B43E6}
+		{5EC69F76-FD37-4F69-997A-D1280A26D1D7} = {A884D726-69BD-46FD-82B5-B1F6195B43E6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C268B8F3-3579-487E-852E-000EEF225BF5}
