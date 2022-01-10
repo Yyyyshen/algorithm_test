@@ -167,7 +167,83 @@ void merge(int* a, int p, int q, int r)
 // 无数优秀架构涉及的思想来源都是基础的数据结构和算法
 //
 
+//
+//回溯算法
+// 
+//贪心算法中，每一步都选择当前最优；但有时，局部最优不一定全局最优，可以选择回溯思想
+//
+//经典问题：八皇后
+// 8*8的棋盘，放8个棋子，每个棋子所在行、列、对角线都不能有另一个棋子
+// 找到所有满足这种要求的放棋子方式
+#define N_QUEENS 8
+int* result = new int[N_QUEENS];//存放结果，下标作为行，值表示Queen放在哪个列
+int result_num = 0;
+bool is_ok(int row, int col);//核心逻辑函数，判断在此位置放置Queen是否合法
+void print_queens();
+void cal_n_queens(int row)	//入口调用cal_n_queens(0)从第一行开始
+{
+	if (row == N_QUEENS)//最后一行也放好了，打印，退出
+	{
+		print_queens();
+		++result_num;
+		return;
+	}
+
+	//检查放到每一列的情况
+	for (int col = 0; col < N_QUEENS; ++col)
+	{
+		if (is_ok(row, col))//放在此位置合法
+		{
+			result[row] = col;//记录一下，如果之后某一行无法继续，回溯回来找到满足条件的新位置后，也会进行覆盖
+			cal_n_queens(row + 1);//从当前情况继续考察下一行
+			//若之后某一次不满足，回一步步退回，再继续从循环中找符合条件的情况
+			//若之后找到了一种满足情况，也会返回来继续找其他可能结果
+		}
+	}
+}
+bool is_ok(int row, int col)
+{
+	int leftup = col - 1, rightup = col + 1;
+	//由于是逐行检查，只需要往上考察之前的每一行
+	for (int i = row - 1; i >= 0; --i)
+	{
+		//当前行不需要考察，因为设定上就是每行只放一个
+		if (result[i] == col) return false;//上一行当前列有棋子则不满足
+		//检查对角线
+		//左上
+		if (leftup >= 0)
+			if (result[i] == leftup)
+				return false;
+		//右上
+		if (rightup < N_QUEENS)
+			if (result[i] == rightup)
+				return false;
+		//为更上一行对角线比较做准备
+		--leftup; ++rightup;
+	}
+	//检查都符合，返回true
+	return true;
+}
+void print_queens()
+{
+	for (int row = 0; row < N_QUEENS; ++row)
+	{
+		for (int col = 0; col < N_QUEENS; ++col)
+		{
+			if (result[row] == col)
+				std::cout << "Q ";//打印放置Queen的位置
+			else
+				std::cout << "* ";//打印普通棋子
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
+}
+// （看到一句比较精髓的话：回溯就是循环内递归。确实只有这样才能在调用到某一步无法继续递归时，回返回之前的递归层，再走循环选另一条路）
+//
+
 int main()
 {
-	std::cout << "Hello World!\n";
+	cal_n_queens(0);
+	std::cout << "cal_n_queens get: " << result_num << " results" << std::endl;
 }
