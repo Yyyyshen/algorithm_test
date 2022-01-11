@@ -462,6 +462,132 @@ int knapsack3(
 // 贪心 一条路走到黑，每一次选择当前最优
 // 回溯 一条路走到黑，但可以重来走完所有情况，再做选择
 // 动态规划 上帝时间，直接推算出所有情况，选择最优
+// 
+//
+//动态规划理论 一个模型，三个特征
+// 
+// 一个模型——多阶段决策最优解模型
+// 指的是动态规划适合解决的问题模型 
+// 用动态规划解决最优问题，而解决问题的过程经历多个决策阶段
+// 每个决策阶段对应一组状态，然后寻找一组决策序列，能够产生最优值
+// 
+// 三个特征——最优子结构、无后效性、重复子问题
+// 问题最优解包含子问题的最优解；也就是后面阶段的状态可以通过前面阶段的状态推导出来
+// 推导后面阶段的状态时，只关心前一阶段状态，不关心过程；某阶段状态一旦确定，就不受之后阶段决策影响
+// 不同的决策序列，到达某个相同阶段时，可能回产生重复的状态；也就是重复状态可合并
+// 
+//解题思路
+// 状态转移表
+// 先用回溯算法，暴力枚举所有可能，然后画出递归树
+// 在递归树中总结是否存在重复子问题，以及重复子问题如何产生
+// 寻找规律，看如何处理
+// 一是用 回溯+备忘录，避免重复子问题
+// 二就是 动态规划的状态转移表
+// 也就是上面例子中的方法，用多维数组表示一组状态，可以先画图自己推，然后翻译成代码
+// 例 求矩阵中左上角到右上角的最短路径
+int matrix[4][4] = {
+	{1,3,5,9},
+	{2,1,3,4},
+	{5,2,6,7},
+	{6,8,4,3}
+};
+// 先用回溯
+int matrix_size = 4;
+int min_dist = 0;
+void min_dist_f(
+	int i,//行
+	int j,//列
+	int dist//走到当前位置的路径长
+)
+{
+	if (i == matrix_size && j == matrix_size)//走到(n-1,n-1)这个位置，说明到了终点
+	{
+		if (dist < min_dist)
+			min_dist = dist;//如果当前情况路径更短，则记录
+		return;
+	}
+	//每一步决策只有两种可能
+	//往下
+	if (i < matrix_size)
+		min_dist_f(i + 1, j, dist + matrix[i][j]);
+	//往右
+	if (j < matrix_size)
+		min_dist_f(i, j + 1, dist + matrix[i][j]);
+
+	/*
+	分析递归树
+	f(0,0,1)
+	f(1,0,3)			f(0,1,4)
+	f(2,0,8) f(1,1,4)	f(1,1,5) f(0,2,9)
+	到此处，已经发现，对于i,j都是1的情况有两种
+	而此时，我们其实只需要计算更小的情况即可，也就是f(1,1,5)分支之后的可以舍弃了
+
+	画一个二维状态表，行列表示棋子所在位置，数值表示从起点到这个点的最短路径
+	states[0] = { 1, 4, 9, 18 } //第一行为与前面累加
+	states[1] = { 3, min(3+1,4+1) = 4, min(4+3,9+3) = 7, min(7+4,18+4) = 11}//后面行开始，每格状态为从左边或从上面走过来的路径最小值）
+	states[2] = { 8, 6, 12, 18 }
+	states[3] = { 14, 14, 16, 19 }
+				//第一列为与前面累加
+	*/
+}
+// 将上述分析过程，翻译成动态规划代码
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+int min_dist_f()
+{
+	int states[4][4] = { 0 };
+	//初始化第一行和第一列值
+	states[0][0] = matrix[0][0];
+	for (int i = 1; i < 4; ++i)
+	{
+		states[0][i] = states[0][i - 1] + matrix[0][i];
+		states[i][0] = states[i - 1][0] + matrix[i][0];
+	}
+	//动态规划填写后面的状态
+	for (int i = 1; i < 4; ++i)
+		for (int j = 1; j < 4; ++j)
+			states[i][j] = matrix[i][j] + min(states[i - 1][j], states[i][j - 1]);
+	//打印结果看下
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 4; ++j)
+			std::cout << states[i][j] << " ";
+		std::cout << std::endl;
+	}
+
+	//返回结果
+	return states[3][3];
+}
+//
+// 状态转移方程法
+// 利用递归，分析某问题如何分解子问题（非常类似于回溯的递归+备忘录）
+// 还有一种是迭代递推
+// 例如上面问题，抽象为方程
+// min_dist(i,j) = matrix[i][j] + min(min_dist(i,j-1), min_dist(i-1,j))
+int mem[4][4] = { 0 };
+int min_dist_f_mem(int i, int j)//调用入口min_dist_f(n-1,n-1);向前递归
+{
+	if (i == 0 && j == 0) return matrix[0][0];//起点值作为递归终点
+	if (mem[i][j] > 0) return mem[i][j];//计算过的值无须重复计算
+	int min_left = 0;
+	if (j - 1 >= 0)
+		min_left = min_dist_f_mem(i, j - 1);//寻找左边的路
+	int min_up = 0;
+	if (i - 1 >= 0)
+		min_up = min_dist_f_mem(i - 1, j);//寻找上边的路
+
+	//计算当前位置从左边或从上边过来最短的路径
+	int min_dist = matrix[i][j] + min(min_left, min_up);
+	mem[i][j] = min_dist;
+	return min_dist;
+}
+// 
+//四种算法对比
+// 贪心、回溯、动态规划其实都可以化为一类
+// 都是需要多阶段决策，然后求最优解
+// 分治算法可以单独分为一类
+// 回溯比较通用，因为是一种暴力枚举，但时间复杂度为指数级
+// 动态规划更高效，但不一定所有问题都能抽象出一个规律
+// 贪心是动态规划的一种特殊情况，最高效，但不一定是最优解
 //
 
 int main()
@@ -469,6 +595,9 @@ int main()
 	//cal_n_queens(0);
 	//std::cout << "cal_n_queens get: " << result_num << " results" << std::endl;
 
-	int ret = knapsack(weight, 5, 9);
-	std::cout << "knapsack ret: " << ret << std::endl;
+	//int ret = knapsack(weight, 5, 9);
+	//std::cout << "knapsack ret: " << ret << std::endl;
+
+	int ret = min_dist_f();
+	std::cout << "min_dist_f ret: " << ret << std::endl;
 }
