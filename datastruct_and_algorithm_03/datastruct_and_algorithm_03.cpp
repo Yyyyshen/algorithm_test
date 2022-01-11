@@ -247,7 +247,7 @@ void print_queens()
 // 可以使用回溯，把物品依次排好，然后每次选择一个物品装或者不装，递归进行，当总重超过W时，停止这一轮递归
 #define W_BAG 100//背包承重
 #define N_ITEM 10//备选物品数量
-int* items = new int[N_ITEM],//存放每个物品重量的数组
+int* items = new int[N_ITEM];//存放每个物品重量的数组
 int maxW = 0;//记录可装最大值
 void bag_0_1(	//调用入口 bag_0_1(0,0);
 	int i,//表示进行到哪个物品
@@ -278,8 +278,197 @@ void bag_0_1(	//调用入口 bag_0_1(0,0);
 // 本质就是枚举，但优点是可以少走些冤枉路
 //
 
+//
+//动态规划
+// 
+//问题引入：凑满减，让选出商品总价最大程度接近满减条件
+// 
+//0-1背包
+// 在回溯中，相当于枚举所有可能性，然后选出一个最好的，时间复杂度较高（指数级）
+// 可以进行改进
+// 仔细看计算过程，其实有很多步骤是重复进行的，可以借助“备忘录”思想，记录下已经计算过的情况，减少重复分支
+int maxRet = 0;//记录最大结果
+int weight[] = { 2,2,4,6,3 };//各物品重量
+int n = 5;//物品个数
+int w = 9;//背包承重
+bool mem[5][10] = { false };//备忘录
+void bag_0_1_mem(
+	int i,//表示检查到第几个物品
+	int cw//表示已经累加了多少重量
+)
+{
+	if (cw == w || i == n)
+	{
+		//装满或者所有物品考察完毕
+		//比之前记录过的大，则记录
+		if (cw > maxRet) maxRet = cw;
+		return;
+	}
+	//检查备忘录
+	if (mem[i][cw]) return;//检查到第i个物品且已累加重量与之前的情况重复了，则从i之后的各种情况也是重复的，就不用再算一遍了
+	//后面还是一样
+	bag_0_1_mem(i + 1, cw);//不装当前物品
+	if (cw + weight[i] <= w)
+		bag_0_1_mem(i + 1, cw + weight[i]);//装当前物品
+}
+// 这种递归+备忘录的方式已经接近动态规划的效率
+// 
+// 再看下动态规划的解法
+/*
+
+ 也是以一个能覆盖所有情况的数组states[n][w+1]来记录每一层能达到的状态
+ 比如
+ 第1个物品（下标0）重量2，装或者不装入背包，有两种状态，即总重量为0或2；我们用1（或true）表示一种状态被标记
+ 则状态数组 states[0] = { 1, 0, 1, 0, 0, 0, 0, 0, 0, 0 }
+ 每一层决策计算好后，下一层基于上一层的状态集合，推导本层状态集合
+ 第2个物品（下标1）重量2，装或者不装背包，加上第一层的两种情况一共4种，0+0，0+2，2+0，2+2 （看到这，感觉就像广度优先，而回溯是深度优先）
+ 但此时有两种状态的结果是重复的，就可以进行合并了，以此达到减少分支的状况
+ 状态数组   states[1] = { 1, 0, 1, 0, 1, 0, 0, 0, 0, 0 }
+ 之后，逐层推进
+ 状态数组   states[2] = { 1, 0, 1, 0, 1, 0, 1, 0, 1, 0 }
+			states[3] = { 1, 0, 1, 0, 1, 0, 1, 0, 1, 0 }//这一层，很明显的所有状态都重合，减少了非常多的重复计算
+ 最后一层   states[4] = { 1, 0, 1, 1, 1, 1, 1, 1, 1, 1 }
+ 那么最终，最后一层的所有状态推导后，我们要找最大的结果，即states[4][9]状态所代表的结果，最大值为9
+
+*/
+#include <vector>
+int knapsack(
+	int* weight,//物品重量数组
+	size_t n,	//物品个数
+	int w		//背包承重
+)
+{
+	//存放状态
+	std::vector<std::vector<int>> states(n, std::vector<int>(w + 1, 0));
+
+	//第一层手动处理，作为基准
+	states[0][0] = 1;//第一个物品不装
+	if (weight[0] <= w)//第一个物品在满足不大于w的情况下装
+		states[0][weight[0]] = 1;
+
+	//遍历其他层
+	for (int i = 1; i < n; ++i)
+	{
+		//每一层和第一层一样，两种情况
+		//不装
+		for (int j = 0; j <= w; ++j)
+			if (states[i - 1][j] == 1)
+				//也就是继承上一层的所有状态（感觉不用判断直接逐个拷贝过来也是一样的）
+				states[i][j] = states[i - 1][j];
+		//装
+		for (int j = 0; j <= w - weight[i]/* 只需要考虑加上此物品后，不会超过承重的部分 */; ++j)
+			if (states[i - 1][j] == 1)
+				states[i][j + weight[i]] = 1;
+	}
+
+	//打印状态，测试用
+	std::cout << "states: " << std::endl;
+	for (int i = 0; i < states.size(); ++i)
+	{
+		for (int j = 0; j < states[i].size(); ++j)
+			std::cout << states[i][j] << " ";
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
+
+	//取出结果
+	for (int i = w; i >= 0; --i)
+		if (states[n - 1][i] == 1)
+			return i;//找到最后一层中满足状态的最大值
+
+	return 0;
+}
+// 动态规划解决这个问题的时间复杂度为O(n*w)，只是两层for循环，而回溯是O(2^n)
+// 空间消耗较多，因为需要一个 n*(w+1) 的二维数组
+// 优化
+// 上面例子中，我们记录了每一层的状态，实际上，我们最终需要的只是最后一层的状态
+// 可以只用一个 w+1 的一维数组记录
+int knapsack2(
+	int* weight,//物品重量数组
+	size_t n,	//物品个数
+	int w		//背包承重
+)
+{
+	//只用一维数组记录状态
+	std::vector<int> states(w + 1, 0);
+	//第一行数据手动计算，作为基础状态
+	states[0] = 1;
+	if (weight[0] <= w)
+		states[weight[0]] = 1;
+	//动态规划
+	for (int i = 1; i < n; ++i)
+		//不装是直接继承，而只用一个一维数组相当于自动继承了前一层的临时状态，所以只需要考虑装的情况
+		for (int j = w - weight[i]; j >= 0; --j)
+			if (states[j] == 1)
+				states[j + weight[i]] = 1;
+	//输出结果
+	for (int i = n - 1; i >= 0; --i)
+		if (states[i] == 1)
+			return i;
+	return 0;
+}
+// 此时，要注意的就是，记录状态的数组在前面的几层都作为临时数据
+// 每一层都需要倒着来循环计算
+// 因为如果正向计算，可能出现某状态还未被使用就被覆盖的情况，信息丢失（或者说重复计算）
+// 而动态规划 无后效性 ，后面的状态不影响前面，从后向前计算就不会发生这个情况
+// 
+// 问题升级：每个物品除了有重量属性，还加上了价值属性
+// 在满足背包承重前提下，求可装入物品的最大总价值
+// 其实依然很简单，把标记为1的状态改为标记总价值即可
+int value[] = { 3,4,8,9,6 };
+int knapsack3(
+	int* weight,//物品重量数组
+	int* value,	//物品价值数组
+	size_t n,	//物品个数
+	int w		//背包承重
+)
+{
+	//存放状态
+	std::vector<std::vector<int>> states(n, std::vector<int>(w + 1, -1));
+	//第一层手动处理
+	states[0][0] = 0;//不装，价值为0
+	if (weight[0] <= w)
+		states[0][weight[0]] = value[0];//装，记录价格
+	//动态规划，状态转移
+	for (int i = 1; i < n; ++i)
+	{
+		//不装，相当于继承所有上一层的状态
+		for (int j = 0; j <= w; ++j)
+			if (states[i - 1][j] >= 0)
+				states[i][j] = states[i - 1][j];
+		//装，则累加价值
+		for (int j = 0; j <= w - weight[i]; ++j)
+		{
+			if (states[i - 1][j] >= 0)
+			{
+				int v = states[i - 1][j] + value[i];
+				//注意的是，继承下来的状态中，可能已经有存在价值的情况，我们只保留价值最大的情况
+				if (v > states[i][j + weight[i]])
+					states[i][j + weight[i]] = v;
+			}
+		}
+	}
+	//在最后一层状态中找出结果
+	int max = -1;
+	for (int i = 0; i <= w; ++i)
+		if (states[n - 1][i] > max)
+			max = states[n - 1][i];
+	return max;
+}
+// 时间空间复杂度，都还是O(n*w)
+// 同样可以用一个一维数组优化空间
+// 
+//对比
+// 贪心 一条路走到黑，每一次选择当前最优
+// 回溯 一条路走到黑，但可以重来走完所有情况，再做选择
+// 动态规划 上帝时间，直接推算出所有情况，选择最优
+//
+
 int main()
 {
-	cal_n_queens(0);
-	std::cout << "cal_n_queens get: " << result_num << " results" << std::endl;
+	//cal_n_queens(0);
+	//std::cout << "cal_n_queens get: " << result_num << " results" << std::endl;
+
+	int ret = knapsack(weight, 5, 9);
+	std::cout << "knapsack ret: " << ret << std::endl;
 }
