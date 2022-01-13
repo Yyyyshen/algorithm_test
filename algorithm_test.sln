@@ -75,6 +75,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "datastruct_and_algorithm_03
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "datastruct_and_algorithm_04", "datastruct_and_algorithm_04\datastruct_and_algorithm_04.vcxproj", "{86ED2EE7-FE31-4637-B2AB-689C85EB148D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "datastruct_and_algorithm_05", "datastruct_and_algorithm_05\datastruct_and_algorithm_05.vcxproj", "{5D47BBF9-1A69-4C0F-9706-897304CCFB70}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -323,6 +325,14 @@ Global
 		{86ED2EE7-FE31-4637-B2AB-689C85EB148D}.Release|x64.Build.0 = Release|x64
 		{86ED2EE7-FE31-4637-B2AB-689C85EB148D}.Release|x86.ActiveCfg = Release|Win32
 		{86ED2EE7-FE31-4637-B2AB-689C85EB148D}.Release|x86.Build.0 = Release|Win32
+		{5D47BBF9-1A69-4C0F-9706-897304CCFB70}.Debug|x64.ActiveCfg = Debug|x64
+		{5D47BBF9-1A69-4C0F-9706-897304CCFB70}.Debug|x64.Build.0 = Debug|x64
+		{5D47BBF9-1A69-4C0F-9706-897304CCFB70}.Debug|x86.ActiveCfg = Debug|Win32
+		{5D47BBF9-1A69-4C0F-9706-897304CCFB70}.Debug|x86.Build.0 = Debug|Win32
+		{5D47BBF9-1A69-4C0F-9706-897304CCFB70}.Release|x64.ActiveCfg = Release|x64
+		{5D47BBF9-1A69-4C0F-9706-897304CCFB70}.Release|x64.Build.0 = Release|x64
+		{5D47BBF9-1A69-4C0F-9706-897304CCFB70}.Release|x86.ActiveCfg = Release|Win32
+		{5D47BBF9-1A69-4C0F-9706-897304CCFB70}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -357,6 +367,7 @@ Global
 		{109DA47A-52FC-4D9E-9FC2-92D826908BC3} = {A884D726-69BD-46FD-82B5-B1F6195B43E6}
 		{5EC69F76-FD37-4F69-997A-D1280A26D1D7} = {A884D726-69BD-46FD-82B5-B1F6195B43E6}
 		{86ED2EE7-FE31-4637-B2AB-689C85EB148D} = {A884D726-69BD-46FD-82B5-B1F6195B43E6}
+		{5D47BBF9-1A69-4C0F-9706-897304CCFB70} = {A884D726-69BD-46FD-82B5-B1F6195B43E6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C268B8F3-3579-487E-852E-000EEF225BF5}
