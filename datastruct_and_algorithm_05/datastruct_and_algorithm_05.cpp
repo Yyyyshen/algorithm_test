@@ -2,6 +2,7 @@
 //
 
 #include <iostream>
+#include <thread>
 
 //
 //实战和练习
@@ -32,16 +33,16 @@
 // 数据量大，需要用双向循环链表
 typedef struct redis_listnode
 {
-    struct redis_listnode* prev;
-    struct redis_listnode* next;
-    void* value;
+	struct redis_listnode* prev;
+	struct redis_listnode* next;
+	void* value;
 } redis_listNode;
 typedef struct redis_list
 {
-    redis_listNode* head;//记录头尾、长度等信息，使用更方便些
-    redis_listNode* tail;
-    unsigned long len;
-    //...
+	redis_listNode* head;//记录头尾、长度等信息，使用更方便些
+	redis_listNode* tail;
+	unsigned long len;
+	//...
 }redis_List;
 // 
 //字典
@@ -95,6 +96,8 @@ typedef struct redis_list
 // 填充叶子节点形成完全二叉树，然后以数组形式存储到硬盘
 // （还有一个结合中序和前序遍历存储，然后根据两种顺序还原唯一树结构，但是不是需要两倍的空间）
 //
+
+
 
 //
 //搜索引擎中的数据结构和算法
@@ -187,7 +190,117 @@ typedef struct redis_list
 // https://github.com/kkzfl22/searchEngine
 //
 
+
+
+//
+//高性能内存消息队列Disruptor背后的数据结构和算法
+// 
+//线程之间用于消息传递的队列，在Apache Storm、Camel、Log4j 2等项目中有应用
+// 
+//基于循环队列的“生产——消费者模型”
+// 例 队列满生产者轮询等待、队列空消费者轮询等待
+class demo_queue final
+{
+public://循环队列
+	demo_queue(size_t s)
+		:size(s)
+	{
+		data = new long[size];
+	}
+	~demo_queue()
+	{
+		delete[] data;
+	}
+public:
+	bool add(long element) noexcept
+	{
+		if ((tail + 1) % size == head) return false;//队列满了
+		data[tail] = element;
+		tail = (tail + 1) % size;//用取模将线性变成环形概念
+		return true;
+	}
+	long poll() noexcept
+	{
+		if (head == tail) return -1;
+		long ret = data[head];
+		head = (head + 1) % size;
+		return ret;
+	}
+
+private:
+	long* data = nullptr;
+	int size = 0;
+	int head = 0, tail = 0;
+};
+class demo_producer final
+{
+public://生产者
+	using queue_type = demo_queue;
+	using data_type = long;
+public:
+	demo_producer(queue_type* queue)
+		: m_queue(queue)
+	{}
+public:
+	void produce(data_type data)
+	{
+		if (m_queue == nullptr) return;
+		while (!m_queue->add(data))
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		//队列满了就轮询重试
+	}
+
+private:
+	queue_type* m_queue;
+};
+class demo_consumer final
+{
+public://消费者
+	using queue_type = demo_queue;
+	using data_type = long;
+public:
+	demo_consumer(queue_type* queue)
+		: m_queue(queue)
+	{}
+public:
+	void consume()
+	{
+		if (m_queue == nullptr) return;
+		while (true)
+		{
+			data_type data = m_queue->poll();
+			if (data == -1) //队列空则等待
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			else
+			{
+				//消费数据逻辑
+				//...
+			}
+		}
+	}
+
+private:
+	queue_type* m_queue;
+};
+// 实际多线程使用时，生产消费需要在操作队列前加锁
+// 
+//基于无锁的并发“生产——消费模型”
+// Disruptor换了一种实现思路
+// 对于生产者，往队列中添加数据之前，先申请可用空闲存储单元
+// 批量的申请n个存储单元，后续往队列中添加元素就不用加锁，因为这组单元是此线程独享
+// （但申请存储单元的过程是加锁的，其实就是减小锁的粒度）
+// 消费者类似，每次申请一批连续可读存储单元（加锁），后续每次读就不用加锁了
+// 
+// 问题
+// 前面的内存没有操作完时，不能操作后续的部分
+// 例如，生产者A申请3~6，生产者B申请7~9，在3~6没有写入数据之前，7~9无法读取，是一个弊端
+// 解释
+// 生产者A和生产者B同时申请3~6和7~9，写入时没有问题
+// 假设某时刻，生产者A写入到5的位置、6为空，生产者B写入到8的位置、9为空
+// 从disruptor队列的设计角度来看，6为空，所以消费者读到的最大可读位置是5，有空位则后续的位置只能等待
+//
+
 int main()
 {
-    std::cout << "Hello World!\n";
+	std::cout << "Hello World!\n";
 }
