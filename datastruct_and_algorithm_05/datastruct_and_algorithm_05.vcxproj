@@ -141,6 +141,10 @@
   <ItemGroup>
     <ClCompile Include="datastruct_and_algorithm_05.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="array.hpp" />
+    <ClInclude Include="public_header.hpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
