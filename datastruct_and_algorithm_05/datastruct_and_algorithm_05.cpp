@@ -390,6 +390,9 @@ private:
 
 //
 //练习
+// 
+// 参考
+// https://github.com/wangzheng0822/algo
 //
 
 
@@ -397,6 +400,26 @@ private:
 //
 //数组和链表
 // 
+//数组
+// 实现动态扩容数组
+// 实现大小固定有序数组，支持动态增删改查
+// 实现两个有序数组合并为一个有序数组
+// 
+//链表
+// 实现单链表、循环链表、双向链表，支持增删改查
+// 实现单链表反转
+// 实现两个有序链表合并一个有序链表
+// 实现求链表中间节点
+// 
+//LeetCode
+// 数组
+// 三数之和 /problems/3sum/
+// 求众数	/problems/majority-element/
+// 求缺失的第一个正数 /problems/first-missing-positive/
+// 
+// 链表
+// 环形链表 /problems/linked-list-cycle/
+// 合并k个排序链表 /problems/merge-k-sorted-lists/
 //
 
 
