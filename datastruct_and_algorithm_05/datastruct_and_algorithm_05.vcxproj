@@ -145,6 +145,7 @@
     <ClInclude Include="array.hpp" />
     <ClInclude Include="public_header.hpp" />
     <ClInclude Include="single_linked_list.hpp" />
+    <ClInclude Include="practice.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

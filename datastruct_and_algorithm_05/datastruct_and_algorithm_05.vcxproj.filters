@@ -29,5 +29,8 @@
     <ClInclude Include="single_linked_list.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="practice.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
