@@ -18,7 +18,8 @@ public:
 	}
 	~array_stack()
 	{
-		delete[] m_arr;
+		if (m_arr != nullptr)
+			delete[] m_arr;
 		m_arr = nullptr;
 	}
 public:
