@@ -6,6 +6,7 @@
 #include <map>
 #include <unordered_map>
 #include <algorithm>
+#include <queue>
 using namespace std;
 
 //三数之和 /problems/3sum/
@@ -184,6 +185,87 @@ int firstMissingPositive(vector<int>& nums) {
 
 
 //环形链表 /problems/linked-list-cycle/
-
+struct ListNode {
+	int val;
+	ListNode* next;
+	ListNode(int x) : val(x), next(NULL) {}
+};
+bool hasCycle(ListNode* head) {
+	if (head == nullptr || head->next == nullptr)
+		return false;
+	ListNode* slow = head, * fast = head;
+	while ((fast != nullptr) && (fast->next != nullptr))//两个条件顺序不能颠倒，先检查本身
+	{
+		slow = slow->next;
+		fast = fast->next->next;
+		if (slow == fast) return true;
+	}
+	return false;
+}
 
 //合并k个排序链表 /problems/merge-k-sorted-lists/
+ListNode* mergeTwoLists(ListNode* l1, ListNode* l2)
+{
+	if (l1 == nullptr)
+		return l2;
+	if (l2 == nullptr)
+		return l1;
+
+	ListNode* sentinel = new ListNode(-1);
+	ListNode* cur = sentinel;
+	while (l1 != nullptr && l2 != nullptr)
+	{
+		if (l1->val <= l2->val)
+		{
+			cur->next = l1;
+			cur = l1;
+			l1 = l1->next;
+		}
+		else
+		{
+			cur->next = l2;
+			cur = l2;
+			l2 = l2->next;
+		}
+	}
+
+	if (l1 != nullptr)
+		cur->next = l1;
+	if (l2 != nullptr)
+		cur->next = l2;
+	return sentinel->next;
+}
+ListNode* mergeKLists(vector<ListNode*>& lists) {
+	if (lists.empty())
+		return nullptr;
+	if (lists.size() == 1)
+		return lists[0];
+	ListNode* ret = lists[0];
+	for (int i = 1; i < lists.size(); ++i)
+		//拆解成合并两个
+		ret = mergeTwoLists(ret, lists[i]);
+	return ret;
+
+	//最小堆解法，优先级队列
+	using node = pair<int, ListNode*>;
+	priority_queue<node, vector<node>, greater<node>> q;
+	for (auto list : lists)
+		if (list != nullptr)
+			q.push({ list->val,list });//从每个链表第一个节点开始入队
+	ListNode* head = nullptr, * cur = nullptr;
+	while (!q.empty())
+	{
+		//优先级队列自动排序，依次出队串起来
+		auto p = q.top();
+		q.pop();
+		if (head == nullptr)
+			head = p.second;
+		else
+			cur->next = p.second;
+		cur = p.second;
+		//将操作的当前节点下一个节点入队
+		if (p.second->next != nullptr)
+			q.push({ p.second->next->val,p.second->next });
+	}
+	return head;
+}
