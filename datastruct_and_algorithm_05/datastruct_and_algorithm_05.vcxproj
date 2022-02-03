@@ -146,7 +146,7 @@
     <ClInclude Include="public_header.hpp" />
     <ClInclude Include="queue.hpp" />
     <ClInclude Include="single_linked_list.hpp" />
-    <ClInclude Include="practice.hpp" />
+    <ClInclude Include="practice_01.hpp" />
     <ClInclude Include="stack.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
