@@ -44,5 +44,8 @@
     <ClInclude Include="sort.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="binary_search.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
