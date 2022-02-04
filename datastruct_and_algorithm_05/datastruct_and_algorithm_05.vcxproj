@@ -145,6 +145,7 @@
     <ClInclude Include="array.hpp" />
     <ClInclude Include="binary_search.hpp" />
     <ClInclude Include="practice_02.hpp" />
+    <ClInclude Include="practice_03.hpp" />
     <ClInclude Include="public_header.hpp" />
     <ClInclude Include="queue.hpp" />
     <ClInclude Include="single_linked_list.hpp" />
