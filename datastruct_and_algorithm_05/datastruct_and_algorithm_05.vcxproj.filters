@@ -56,5 +56,8 @@
     <ClInclude Include="strings.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="practice_04.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
