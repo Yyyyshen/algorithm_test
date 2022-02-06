@@ -145,6 +145,7 @@
     <ClInclude Include="array.hpp" />
     <ClInclude Include="binary_search.hpp" />
     <ClInclude Include="hashtable.hpp" />
+    <ClInclude Include="heap.hpp" />
     <ClInclude Include="practice_02.hpp" />
     <ClInclude Include="practice_03.hpp" />
     <ClInclude Include="practice_04.hpp" />
