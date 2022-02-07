@@ -152,6 +152,7 @@
     <ClInclude Include="practice_04.hpp" />
     <ClInclude Include="practice_05.hpp" />
     <ClInclude Include="practice_06.hpp" />
+    <ClInclude Include="practice_07.hpp" />
     <ClInclude Include="public_header.hpp" />
     <ClInclude Include="queue.hpp" />
     <ClInclude Include="single_linked_list.hpp" />
