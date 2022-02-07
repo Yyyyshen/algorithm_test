@@ -68,5 +68,8 @@
     <ClInclude Include="practice_05.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="graph.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

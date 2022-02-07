@@ -144,6 +144,7 @@
   <ItemGroup>
     <ClInclude Include="array.hpp" />
     <ClInclude Include="binary_search.hpp" />
+    <ClInclude Include="graph.hpp" />
     <ClInclude Include="hashtable.hpp" />
     <ClInclude Include="heap.hpp" />
     <ClInclude Include="practice_02.hpp" />
