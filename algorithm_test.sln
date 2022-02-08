@@ -85,6 +85,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "leetcode101_cpp", "leetcode
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leetcode101_cpp_01", "leetcode101_cpp_01\leetcode101_cpp_01.vcxproj", "{71229400-5BCD-4D9D-9CB3-9DCB4EDD1063}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "grokking_02", "grokking_02\grokking_02.vcxproj", "{21AF79D1-5A7F-4F30-A589-703E81386EDD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -357,6 +359,14 @@ Global
 		{71229400-5BCD-4D9D-9CB3-9DCB4EDD1063}.Release|x64.Build.0 = Release|x64
 		{71229400-5BCD-4D9D-9CB3-9DCB4EDD1063}.Release|x86.ActiveCfg = Release|Win32
 		{71229400-5BCD-4D9D-9CB3-9DCB4EDD1063}.Release|x86.Build.0 = Release|Win32
+		{21AF79D1-5A7F-4F30-A589-703E81386EDD}.Debug|x64.ActiveCfg = Debug|x64
+		{21AF79D1-5A7F-4F30-A589-703E81386EDD}.Debug|x64.Build.0 = Debug|x64
+		{21AF79D1-5A7F-4F30-A589-703E81386EDD}.Debug|x86.ActiveCfg = Debug|Win32
+		{21AF79D1-5A7F-4F30-A589-703E81386EDD}.Debug|x86.Build.0 = Debug|Win32
+		{21AF79D1-5A7F-4F30-A589-703E81386EDD}.Release|x64.ActiveCfg = Release|x64
+		{21AF79D1-5A7F-4F30-A589-703E81386EDD}.Release|x64.Build.0 = Release|x64
+		{21AF79D1-5A7F-4F30-A589-703E81386EDD}.Release|x86.ActiveCfg = Release|Win32
+		{21AF79D1-5A7F-4F30-A589-703E81386EDD}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -394,6 +404,7 @@ Global
 		{5D47BBF9-1A69-4C0F-9706-897304CCFB70} = {A884D726-69BD-46FD-82B5-B1F6195B43E6}
 		{16AF85C3-E2DE-4C72-A020-9E6744C0DA15} = {C8DE243D-EB83-490E-BFCF-B9DFC054677B}
 		{71229400-5BCD-4D9D-9CB3-9DCB4EDD1063} = {B9AC274D-7BA4-4225-83EF-A434F5CCE030}
+		{21AF79D1-5A7F-4F30-A589-703E81386EDD} = {DE4DDB7D-3A73-4E39-B29E-38B425A69846}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C268B8F3-3579-487E-852E-000EEF225BF5}
