@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <queue>
 #include <stack>
+#include <unordered_set>
 using namespace std;
 
 //
@@ -765,15 +766,350 @@ public:
 //快慢指针
 //
 
-//例：
+//例：环链表相关
+class ListNode {
+public:
+	int value = 0;
+	ListNode* next;
+
+	ListNode(int value) {
+		this->value = value;
+		next = nullptr;
+	}
+};
+class LinkedListCycle {
+public:
+	//检测环
+	//时间复杂度O(N)，空间O(1)
+	static bool hasCycle(ListNode* head) {
+		if (head == nullptr) return false;
+		ListNode* slow = head, * fast = head;
+		while (fast != nullptr && fast->next != nullptr)
+		{
+			slow = slow->next;
+			fast = fast->next->next;
+			if (slow == fast) return true;
+		}
+		return false;
+	}
+
+	//求环长
+	static int cycleLen(ListNode* head) {
+		if (head == nullptr) return -1;
+		ListNode* slow = head, * fast = head;
+		int ret = 0;
+		while (fast != nullptr && fast->next != nullptr)
+		{
+			slow = slow->next;
+			fast = fast->next->next;
+			if (slow == fast)
+			{
+				//找到环之后，一次走一步并计数，直到再次找到
+				do
+				{
+					fast = fast->next;
+					++ret;
+				} while (slow != fast);
+				break;
+			}
+		}
+		return ret;
+	}
+
+	//求环头
+	static ListNode* findCycleStart(ListNode* head) {
+		ListNode* slow = head, * fast = head;
+		int cycle_len = 0;
+		while (fast != nullptr && fast->next != nullptr)
+		{
+			fast = fast->next->next;
+			slow = slow->next;
+			if (slow == fast)//检测环
+			{
+				do
+				{
+					fast = fast->next;
+					++cycle_len;
+				} while (fast != slow);
+				break;//计算环长
+			}
+		}
+		if (cycle_len != 0)
+		{
+			//两个指针归位
+			slow = fast = head;
+			//快指针先走环长步数
+			while (cycle_len > 0)
+			{
+				fast = fast->next;
+				--cycle_len;
+			}
+			//之后两个指针一起走，第一次相遇的时候就是环头
+			while (slow != fast)
+			{
+				slow = slow->next;
+				fast = fast->next;
+			}
+		}
+		return slow;
+	}
+};
+
+//例：求快乐数字
+//快乐数字的定义是，一个数字反复计算每一位的平方和，最终回回归到1
+//不是快乐数字的平方和计算中，会出现循环
+class HappyNumber {
+public:
+	static bool find(int num) {
+		//方法1，使用额外空间记录
+		unordered_set<int> memo;//记录出现过的平方和
+		while (true)
+		{
+			int mod = 0, sum = 0;
+			//计算平方和
+			while (num > 0)
+			{
+				mod = num % 10;
+				sum += mod * mod;
+				num /= 10;
+			}
+			//出现过，则有循环，返回false
+			if (memo.find(sum) != memo.end())
+				break;
+			//平方和为1，满足条件，返回true
+			if (sum == 1)
+				return true;
+			//并记录本次计算结果并准备下一次计算
+			memo.insert(sum);
+			num = sum;
+		}
+		return false;
+
+		//方法2
+		//使用本章内容的快慢指针思想，可以不使用额外空间
+		int slow = 0, fast = 0;
+		do
+		{
+			//每次循环，慢的计算一次，快的计算两次，用调用次数来表示步数，一开始想不到
+			//不管是归为1还是出现循环，最终他们会相等
+			slow = square_sum(slow);
+			fast = square_sum(square_sum(fast));
+		} while (slow != fast);
+		return slow == 1;//看相当时结果是否为1
+
+		//时间复杂度应该相同，就是快慢指针节约了空间
+		//其中，数字在1000以内，最多计算1001次，N+1
+		//但N足够大时，根据科学计算，M位，也就是Log(N+1)位，最多出现的平方和为9^2M
+		//也就是 O(81*log(N+1)) 可以看作时间复杂度 O(LogN)
+	}
+	//封装计算平方和函数
+	static int square_sum(int num)
+	{
+		int sum = 0, mod = 0;
+		while (num > 0)
+		{
+			mod = num % 10;
+			sum += mod * mod;
+			num /= 10;
+		}
+		return sum;
+	}
+};
+
+//例：求链表中间元素
+class MiddleOfLinkedList {
+public:
+	static ListNode* findMiddle(ListNode* head) {
+		ListNode* slow = head, * fast = head;
+		while (fast != nullptr && fast->next != nullptr)
+		{
+			fast = fast->next->next;
+			slow = slow->next;
+		}
+		return slow;
+	}
+};
 
 //
 //总结
 // 两个指针以不同速度在数组/链表中移动
-// 在处理循环时很有用
+// 最经典的问题是处理循环
 // 也可用于产生距离，找特定位置元素
+// 
+// 快慢指针还可以变种
+// 用调用次数代替步数概念，例如求平方和例子
 //
 
+//练习：给定单链表，检查链表内容是否为回文
+class PalindromicLinkedList {
+public:
+	static bool isPalindrome(ListNode* head) {
+		if (head == nullptr || head->next == nullptr) return true;
+		ListNode* tmp = head;
+		//定义一个反转链表，然后对比是否相同
+		ListNode* l2 = new ListNode(tmp->value);
+		do
+		{
+			tmp = tmp->next;
+			ListNode* new_node = new ListNode(tmp->value);
+			new_node->next = l2;
+			l2 = new_node;
+		} while (tmp->next != nullptr);
+		ListNode* p1 = head, * p2 = l2;
+		while (p1 != nullptr && p2 != nullptr)
+		{
+			if (p1->value != p2->value) return false;
+			p1 = p1->next;
+			p2 = p2->next;
+		}
+		return p1 == p2;
+
+		//使用快慢指针，先找中点，然后原地反转后半部分
+		//由于要求原链不变，检查完回文再恢复
+		if (head == nullptr || head->next == nullptr) return true;
+		ListNode* slow = head, * fast = head;
+		while (fast != nullptr && fast->next != nullptr)
+		{
+			fast = fast->next->next;
+			slow = slow->next;
+		}
+		//走完后，slow为中间，原地反转
+		ListNode* new_head = reverse(slow);
+		//反转后new_head为新头
+		//验证是否是回文
+		ListNode* p1 = head, * p2 = new_head;
+		while (p1 != nullptr && p2 != nullptr)
+		{
+			if (p1->value != p2->value)
+				break;
+			p1 = p1->next;
+			p2 = p2->next;
+		}
+		//根据new_head反转一次链表，恢复状态
+		reverse(new_head);
+		//返回是否为回文
+		if (p1 == nullptr || p2 == nullptr)
+			return true;
+		return false;
+	}
+	static ListNode* reverse(ListNode* head)
+	{
+		ListNode* prev = nullptr, * tmp = nullptr;
+		while (head != nullptr)
+		{
+			tmp = head->next;
+			head->next = prev;
+			prev = head;
+			head = tmp;
+		}
+		return prev;
+	}
+};
+
+//练习：给定单链表，将后半部分节点已相反顺序交替插入前半部分，要求原地操作
+//分析，先找中点，再把后续每个节点插入到前面，由于是相反顺序插入，则反转后半部分再从头依次插入
+class RearrangeList {
+public:
+	static void reorder(ListNode* head) {
+		if (head == nullptr || head->next == nullptr) return;
+		ListNode* slow = head, * fast = head;
+		while (fast != nullptr && fast->next != nullptr)
+		{
+			fast = fast->next->next;
+			slow = slow->next;
+		}
+		//根据中点slow反转后半部分
+		ListNode* prev = nullptr, * tmp = nullptr;
+		while (slow != nullptr)
+		{
+			tmp = slow->next;
+			slow->next = prev;
+			prev = slow;
+			slow = tmp;
+		}
+		//从头开始，交替拼接
+		ListNode* p1 = head, * p2 = prev;
+		while (p1 != nullptr && p2 != nullptr)
+		{
+			tmp = p2->next;
+			p2->next = p1->next;
+			p1->next = p2;
+			p1 = p2->next;
+			p2 = tmp;
+		}
+		if (p1 != nullptr)
+			p1->next = nullptr;
+	}
+};
+
+//练习：一个包含正负数的数组，索引的每个值都代表下一次行进的步数
+//检查是否含有环（单项，也就是不能同时有正负）
+//分析，快慢指针找环，找到环之后遍历一遍环，看正负数个数
+class CircularArrayLoop {
+public:
+	static bool loopExists(const vector<int>& arr) {
+		int n = arr.size(), p1 = 0, p2 = 0, n1 = 0, n2 = 0, times = 2 * n;
+		if (n == 0 || n == 1) return false;
+		while (times > 0)
+		{
+			p1 = (p1 + arr[p1]) % n;
+			p2 = (p2 + arr[p2]) % n;
+			p2 = (p2 + arr[p2]) % n;
+			if (p1 == p2) break;
+			times--;
+		}
+		if (p1 != p2) return false;
+		do
+		{
+			if (arr[p2] > 0)
+				++n1;
+			else
+				++n2;
+			p2 = (p2 + arr[p2]) % n;
+		} while (p1 != p2);
+		if (n1 != 0 && n2 != 0) return false;
+		return true;
+
+		//答案思路，从数组每个索引开始找循环
+		//循环中，如果改变了方向，则不符合
+		for (int i = 0; i < arr.size(); i++) {
+			bool isForward = arr[i] >= 0;  // if we are moving forward or not
+			int slow = i, fast = i;
+
+			// if slow or fast becomes '-1' this means we can't find cycle for this number
+			do {
+				slow = findNextIndex(arr, isForward, slow);  // move one step for slow pointer
+				fast = findNextIndex(arr, isForward, fast);  // move one step for fast pointer
+				if (fast != -1) {
+					fast = findNextIndex(arr, isForward, fast);  // move another step for fast pointer
+				}
+			} while (slow != -1 && fast != -1 && slow != fast);
+
+			if (slow != -1 && slow == fast) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+	static int findNextIndex(const vector<int>& arr, bool isForward, int currentIndex) {
+		bool direction = arr[currentIndex] >= 0;
+		if (isForward != direction) {
+			return -1;  // change in direction, return -1
+		}
+
+		int nextIndex = (currentIndex + arr[currentIndex]) % (int)arr.size();
+		if (nextIndex < 0)
+			nextIndex += arr.size(); // wrap around for negative numbers
+
+		  // one element cycle, return -1
+		if (nextIndex == currentIndex) {
+			nextIndex = -1;
+		}
+
+		return nextIndex;
+	}
+};
 
 //================================================================
 
