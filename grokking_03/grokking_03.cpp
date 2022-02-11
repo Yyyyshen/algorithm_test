@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <queue>
+#include <unordered_set>
 using namespace std;
 
 //
@@ -353,11 +354,171 @@ public:
 //循环排序
 //
 
-//例：
+//例：1到n范围的数组，原地排序
+//数值范围确认，则与索引可以建立一种映射关系，将元素换到对应位置即可
+class CyclicSort {
+public:
+	static void sort(vector<int>& nums) {
+		int start = 0;
+		while (start < nums.size())
+		{
+			if (nums[start] == nums[nums[start] - 1])
+				++start;
+			else
+				swap(nums[start], nums[nums[start] - 1]);
+		}
+	}
+};
+
+//例：给定n个0~n的数字，找出缺失的数字
+class MissingNumber {
+public:
+	static int findMissingNumber(vector<int>& nums) {
+		//位图法，需要额外空间
+#if 0
+		vector<int> memo(nums.size() + 1, -1);
+		for (auto num : nums)
+			memo[num] = num;
+		for (int i = 0; i < memo.size(); ++i)
+			if (memo[i] == -1)
+				return i;
+		return -1;
+#endif
+		//依然使用上一例中的原地交换，也需要两次循环
+		int i = 0;
+		while (i < nums.size())
+		{
+			if (nums[i] != i && nums[i] < nums.size())//范围比个数大一，跳过超过的情况
+				swap(nums[i], nums[nums[i]]);
+			else
+				++i;
+		}
+		//遍历一遍，没有被换到正确位置的数字（超过数组范围的那个）的索引就是缺失的数
+		for (int i = 0; i < nums.size(); ++i)
+			if (nums[i] != i)
+				return i;
+		return -1;
+	}
+};
+
+//例：给定1~n范围内数字查找重复数字
+class FindAllDuplicate {
+public:
+	static vector<int> findNumbers(vector<int>& nums) {
+		//位图法都大同小异，略过，找原地操作的方法
+		vector<int> duplicateNumbers;
+		//同样是把数字往对应的位置上放，当交换时发现两个数相等，则记录并进行下一个
+		int i = 0;
+		while (i < nums.size())
+		{
+			if (nums[i] != i + 1)
+			{
+				if (nums[i] == nums[nums[i] - 1])
+				{
+					//或者全换完，出去的时候再遍历一遍找不在正确位置的元素
+					duplicateNumbers.push_back(nums[i]);
+					++i;
+				}
+				else
+					swap(nums[i], nums[nums[i] - 1]);
+			}
+			else
+				++i;
+		}
+
+		return duplicateNumbers;
+	}
+};
 
 //
 //总结
+// 用于处理涉及给定范围内数字的数组问题
+// 由于范围确定，那么元素与数组索引之间一定存在一种映射关系
+// （以为我的理解，这类问题会想到位图法）
+// 本方法思想是
+// 在原地处理的基础上
+// 根据映射关系在循环中交换元素到正确的位置
 //
+
+//练习：给定1到n的n个数字，其中有一个重复，找出重复的数字以及因为重复而缺失的数字
+class FindCorruptNums {
+public:
+	static vector<int> findNumbers(vector<int>& nums) {
+		int i = 0;
+		while (i < nums.size())
+		{
+			//交换到正确位置，并且如果交换的数字相等，则跳过，避免死循环
+			if (nums[i] != nums[nums[i] - 1])
+				swap(nums[i], nums[nums[i] - 1]);
+			else
+				++i;
+		}
+		for (i = 0; i < nums.size(); ++i)
+			if (nums[i] != i + 1)
+				//不在正确位置上的数字为重复数字，而其索引+1，为缺失数字
+				return { i + 1,nums[i] };
+		return vector<int>{-1, -1};
+	}
+};
+
+//练习：给定未排序数组，找到缺失的最小正数
+class FirstSmallestMissingPositive {
+public:
+	static int findNumber(vector<int>& nums) {
+		//跟前面题一样，把数字换到正确位置，只不过超过范围的和负数跳过
+		int i = 0;
+		while (i < nums.size())
+		{
+			if (nums[i] == nums[nums[i] - 1] && nums[i] > 0 && nums[i] <= nums.size())
+				swap(nums[i], nums[nums[i] - 1]);
+			else
+				++i;
+		}
+		for (int i = 0; i < nums.size(); ++i)
+			if (nums[i] != i + 1)
+				return i + 1;
+		return nums.size() + 1;//都符合，则缺少的是最后一个数+1，也是size+1
+	}
+};
+
+//练习：找出前K个缺失的正数
+class FirstKMissingPositive {
+public:
+	static vector<int> findNumbers(vector<int>& nums, int k) {
+		//跟之前一样的思路，将数字都换到正确的位置
+		//之后遍历一遍，与索引位置不对应的是缺失的数字
+		//不同的是，如果数组中缺失的个数小于k，需要从数组大小之后的数字往里填
+		//而不再正确位置的数字可能本身就是超过数组大小的，所以要记录下来并跳过
+		vector<int> missingNumbers;
+		int i = 0;
+		while (i < nums.size())
+		{
+			if (nums[i] != nums[nums[i] - 1] && nums[i] > 0 && nums[i] <= nums.size())
+				swap(nums[i], nums[nums[i] - 1]);
+			else
+				++i;
+		}
+		unordered_set<int> memo;
+		for (int i = 0; i < nums.size() && missingNumbers.size() < k; ++i)
+		{
+			if (nums[i] != i + 1)
+			{
+				memo.insert(nums[i]);
+				missingNumbers.push_back(i + 1);
+			}
+		}
+		int miss = nums.size() + 1;
+		while (missingNumbers.size() < k)
+		{
+			if (memo.find(miss) != memo.end())
+				++miss;
+			else
+				missingNumbers.push_back(miss++);
+		}
+
+		return missingNumbers;
+	}
+};
 
 int main()
 {
