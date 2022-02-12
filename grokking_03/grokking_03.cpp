@@ -520,6 +520,249 @@ public:
 	}
 };
 
+//=======================================================================
+
+//
+//反转链表
+//
+
+//例：反转链表
+class ListNode {
+public:
+	int value = 0;
+	ListNode* next;
+
+	ListNode(int value) {
+		this->value = value;
+		next = nullptr;
+	}
+};
+class ReverseLinkedList {
+public:
+	static ListNode* reverse(ListNode* head) {
+		//一般例子都是使用三个辅助成员，而其实参数head本身就可以作为一个成员使用
+		ListNode* prev = nullptr, * tmp = nullptr;
+		while (head != nullptr)
+		{
+			tmp = head->next;
+			head->next = prev;
+			prev = head;
+			head = tmp;
+		}
+		return prev;
+	}
+};
+
+//例：反转部分链表
+class ReverseSubList {
+public:
+	static ListNode* reverse(ListNode* head, int p, int q) {
+		if (p >= q) return head;//区间不正确
+		//记录q指向点的下一个，p指向点以及其前一个
+		ListNode* qnext = head, * cur_prev = head, * cur = nullptr;
+		//找pprev
+		for (int i = 1; i < p - 1 && cur_prev != nullptr; ++i)
+			cur_prev = cur_prev->next;
+		//p超过链长
+		if (cur_prev == nullptr || cur_prev->next == nullptr) return head;
+		cur = cur_prev->next;
+		//特殊情况，p指向头，变种题目就是反转前k个元素
+		if (p == 1)
+		{
+			cur_prev = nullptr;
+			cur = head;
+		}
+		//找qnext
+		for (int i = 1; i < q + 1 && qnext != nullptr; ++i)
+			qnext = qnext->next;
+		//反转p到q
+		ListNode* prev = qnext, * tmp = nullptr;
+		while (cur != qnext)
+		{
+			tmp = cur->next;
+			cur->next = prev;
+			prev = cur;
+			cur = tmp;
+		}
+		//p前点拼接
+		if (cur_prev != nullptr)
+			cur_prev->next = prev;
+		else//p=1也就是指向头时的特殊情况
+			head = prev;
+		return head;
+	}
+};
+
+//例：反转链表中每K个元素
+class ReverseEveryKElements {
+public:
+	static ListNode* reverse(ListNode* head, int k) {
+		//检查参数
+		if (head == nullptr || k <= 1) return head;
+		//记录 每次k个元素之后的下一个元素，也是下次反转的头元素；当前反转头，以及所需的辅助指针
+		ListNode* everyKhead = head, * cur = nullptr, * prev = nullptr, * tmp = nullptr;
+		//记录 每次最开始的头指针，用于串联每次反转后前面的部分
+		ListNode* everyold = nullptr, * tmp2 = nullptr;
+		do
+		{
+			//每次从k个元素下一个开始
+			cur = everyKhead;
+			tmp2 = everyKhead;
+			//找到下一个备用，也是反转后第一个prev的指向点，可用于串联后面
+			for (int i = 0; i < k && everyKhead != nullptr; ++i)
+				everyKhead = everyKhead->next;
+			prev = everyKhead;
+			while (cur != everyKhead)
+			{
+				tmp = cur->next;
+				cur->next = prev;
+				prev = cur;
+				cur = tmp;
+			}
+			if (everyold == nullptr)
+				head = prev;
+			else
+				everyold->next = prev;
+			everyold = tmp2;
+		} while (everyKhead != nullptr);
+		return head;
+
+		//标准答案，直接反转后再串联前后的方法，比自己的方法少用一个辅助指针
+		if (k <= 1 || head == nullptr) {
+			return head;
+		}
+
+		ListNode* current = head, * previous = nullptr;
+		while (true) {
+			ListNode* lastNodeOfPreviousPart = previous;
+			// after reversing the LinkedList 'current' will become the last node of the sub-list
+			ListNode* lastNodeOfSubList = current;
+			ListNode* next = nullptr;  // will be used to temporarily store the next node
+			// reverse 'k' nodes
+			for (int i = 0; current != nullptr && i < k; i++) {
+				next = current->next;
+				current->next = previous;
+				previous = current;
+				current = next;
+			}
+
+			// connect with the previous part
+			if (lastNodeOfPreviousPart != nullptr) {
+				lastNodeOfPreviousPart->next =
+					previous;  // 'previous' is now the first node of the sub-list
+			}
+			else {         // this means we are changing the first node (head) of the LinkedList
+				head = previous;
+			}
+
+			// connect with the next part
+			lastNodeOfSubList->next = current;
+
+			if (current == nullptr) {  // break, if we've reached the end of the LinkedList
+				break;
+			}
+			// prepare for the next sub-list
+			previous = lastNodeOfSubList;
+		}
+
+		return head;
+	}
+};
+
+//
+//总结
+// 一些问题中，需要反转（部分）链表
+// 时间复杂度上，使用额外的新空间建立一条反向链表 与 就地反转
+// 都需要两次循环，建立/回收 与 反转/反转
+// 为了节省空间，最好还是就地反转
+// 例如之前的回文链表检查，除了两点法，还用到了原地反转后半部分链表
+//
+
+//练习：交替反转链表中每k个元素（k个元素反转，下k个元素不反转，依次类推
+class ReverseAlternatingKElements {
+public:
+	static ListNode* reverse(ListNode* head, int k) {
+		if (head == nullptr || k < 2) return head;
+		ListNode* cur = head, * prev = nullptr, * tmp = nullptr;
+		while (cur != nullptr)
+		{
+			ListNode* prev_tmp = prev, * cur_tmp = cur;
+			//反转当前
+			for (int i = 0; i < k; ++i)
+			{
+				tmp = cur->next;
+				cur->next = prev;
+				prev = cur;
+				cur = tmp;
+			}
+
+			cur_tmp->next = cur;//链接后面
+			if (prev_tmp == nullptr)
+				head = prev;
+			else
+				prev_tmp->next = prev;//链接前面
+
+			//交替进行
+			for (int i = 0; i < k && cur != nullptr; ++i)
+			{
+				prev = cur;
+				cur = cur->next;
+			}
+		}
+		return head;
+	}
+};
+
+//练习：给定单链表，右旋转k个节点
+class RotateList {
+public:
+	static ListNode* rotate(ListNode* head, int rotations) {
+		//参数检查
+		if (head == nullptr || head->next == nullptr || rotations <= 0) return head;
+		//记录 链尾，当前处理节点，以及下一个要处理的节点
+		ListNode* tail = head, * cur = head, * next = nullptr;
+		//找到链尾
+		while (tail->next != nullptr) tail = tail->next;
+		//循环链接
+		for (int i = 0; i < rotations; ++i)
+		{
+			next = cur->next;
+			cur->next = nullptr;
+			tail->next = cur;
+			tail = cur;
+			cur = next;
+			head = cur;
+		}
+		return head;
+
+		//优化，旋转中，如果旋转次数超过链长，超过部分实际上就相当于又从原链表开始操作
+		//所以，实际上可以在找链尾时顺便计算链长，之后旋转次数对链长取模，避免不必要的操作
+		//另外，对于反转操作，不需要每次都 断开第一个节点-》链接到尾部-》重新记录头尾
+		//可以直接把尾部指向头，形成一个环，然后找一个指针走模长的步数，并在此处断开链环即可
+		if (head == nullptr || head->next == nullptr || rotations <= 0)
+			return head;
+		ListNode* tail = head;
+		int link_len = 1;
+		//求链尾和链长
+		while (tail->next != nullptr)
+		{
+			tail = tail->next;
+			++link_len;
+		}
+		//计算真实操作步骤
+		int op_nums = link_len - (rotations % link_len);
+		//然链成环
+		tail->next = head;
+		//走对应步数
+		for (int i = 0; i < op_nums; ++i)
+			tail = tail->next;
+		//断开环
+		head = tail->next;
+		tail->next = nullptr;
+		return head;
+	}
+};
+
 int main()
 {
 	std::cout << "Hello World!\n";
