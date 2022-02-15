@@ -497,6 +497,197 @@ public:
 //两堆法
 //
 
+//例：设计一个类，以便求一组数字的中位数
+class MedianOfAStream {
+public:
+	virtual void insertNum(int num) {
+		//根据元素大小，填入不同的堆
+		if (smaller.empty() || num <= smaller.top())
+			smaller.push(num);
+		else
+			bigger.push(num);
+		//平衡两堆大小，最大堆允许比最小堆大1
+		if (smaller.size() > bigger.size() + 1)
+		{
+			bigger.push(smaller.top());
+			smaller.pop();
+		}
+		else if (bigger.size() > smaller.size())
+		{
+			smaller.push(bigger.top());
+			bigger.pop();
+		}
+	}
+
+	virtual double findMedian() {
+		//由于最大堆可以大1，所以堆顶要么是两堆顶平均值，要么是最大堆堆顶。另外注意返回浮点数
+		return smaller.size() == bigger.size() ? (smaller.top() / 2.0 + bigger.top() / 2.0) : smaller.top();
+	}
+private:
+	//较小的半组数据用最大堆，较大的半组数据用最小堆，这样中位数在两个堆顶产生
+	priority_queue<int> smaller;
+	priority_queue<int, vector<int>, greater<int>> bigger;
+};
+
+//例：给定数组和一个数字k，求每个大小为k的窗口的中位数
+//滑动窗口结合上例求中位数，但需要扩展一个移除接口
+template<typename T, class Container = vector<T>, class Compare = less<typename Container::value_type>>
+class priority_queue_with_remove :public priority_queue<T, Container, Compare>
+{
+public:
+	bool remove(const T& value)
+	{
+		auto iter = find(this->c.begin(), this->c.end(), value);//找是否存在指定元素
+		if (iter == this->c.end()) return false;//没找到则返回失败
+		this->c.erase(iter);//删除指定元素
+		std::make_heap(this->c.begin(), this->c.end(), this->comp);//删除后要手动重新堆化
+		return true;
+	}
+};
+class SlidingWindowMedian {
+public:
+	virtual vector<double> findSlidingWindowMedian(const vector<int>& nums, int k) {
+		vector<double> result(nums.size() - k + 1);
+		int window_start = 0;
+		for (int window_end = 0; window_end < nums.size(); ++window_end)
+		{
+			insert(nums[window_end]);
+			if (window_end >= k - 1)
+			{
+				result.push_back(findMedian());
+				remove(nums[window_start]);
+				++window_start;
+			}
+		}
+		//时间复杂度O(N*K)，遍历整个数组消耗N，在堆操作中，插入/移除消耗logK但移除前搜索需要消耗K
+		//空间复杂度O(K)，因为是固定大小窗口，两堆中存放元素总数恒定
+		return result;
+	}
+	void insert(int num)
+	{
+		if (smaller.empty() || num <= smaller.top())
+			smaller.push(num);
+		else
+			bigger.push(num);
+		balance();
+	}
+	double findMedian()
+	{
+		return smaller.size() == bigger.size() ? (smaller.top() / 2.0 + bigger.top() / 2.0) : smaller.top();
+	}
+	void remove(int num)
+	{
+		if (num <= smaller.top())
+			smaller.remove(num);
+		else
+			bigger.remove(num);
+		balance();
+	}
+	void balance()
+	{
+		if (smaller.size() > bigger.size() + 1)
+		{
+			bigger.push(smaller.top());
+			smaller.pop();
+		}
+		else if (bigger.size() > smaller.size())
+		{
+			smaller.push(bigger.top());
+			bigger.pop();
+		}
+	}
+private:
+	//同样使用大顶堆存较小一半，小顶堆存较大一半
+	priority_queue_with_remove<int> smaller;
+	priority_queue_with_remove<int, vector<int>, greater<int>> bigger;
+};
+
+//
+//总结
+// 在一些问题中，一组元素可以分为两部分
+// 用最大、最小两个堆，分别了解最大和最小元素来解决问题
+//
+
+//练习：给定区间数组，找出每个区间的下一个区间是否在数组中以及他们的位置
+//对区间头和区间尾分别建立一个最大堆
+//从最大区间尾开始，如果大于最大区间头，则一定没有后续区间，弹出继续
+//如果有后续区间，要从以区间头建立的最大堆中找到区间头最小且满足条件的一个
+//注意每次找到一个满足条件的区间后还要放回最大区间头的堆，因为可能还会作为另一个区间的后续区间
+class Interval {
+public:
+	int start = 0;
+	int end = 0;
+	Interval(int start, int end) {
+		this->start = start;
+		this->end = end;
+	}
+};
+class NextInterval {
+public:
+	struct startCompare {
+		bool operator()(const pair<Interval, int>& x, const pair<Interval, int>& y) {
+			return y.first.start > x.first.start;
+		}
+	};
+
+	struct endCompare {
+		bool operator()(const pair<Interval, int>& x, const pair<Interval, int>& y) {
+			return y.first.end > x.first.end;
+		}
+	};
+
+	static vector<int> findNextInterval(const vector<Interval>& intervals) {
+		int n = intervals.size();
+		// heap for finding the maximum start
+		priority_queue<pair<Interval, int>, vector<pair<Interval, int>>, startCompare> maxStartHeap;
+		// heap for finding the minimum end
+		priority_queue<pair<Interval, int>, vector<pair<Interval, int>>, endCompare> maxEndHeap;
+
+		vector<int> result(n);
+		for (int i = 0; i < intervals.size(); i++) {
+			maxStartHeap.push(make_pair(intervals[i], i));
+			maxEndHeap.push(make_pair(intervals[i], i));
+		}
+
+		// go through all the intervals to find each interval's next interval
+		for (int i = 0; i < n; i++) {
+			// let's find the next interval of the interval which has the highest 'end'
+			auto topEnd = maxEndHeap.top();
+			maxEndHeap.pop();
+
+			result[topEnd.second] = -1;  // defaults to -1
+			if (maxStartHeap.top().first.start >= topEnd.first.end) {
+				auto topStart = maxStartHeap.top();
+				maxStartHeap.pop();
+				// find the the interval that has the closest 'start'
+				while (!maxStartHeap.empty() && maxStartHeap.top().first.start >= topEnd.first.end) {
+					topStart = maxStartHeap.top();
+					maxStartHeap.pop();
+				}
+				result[topEnd.second] = topStart.second;
+				// put the interval back as it could be the next interval of other intervals
+				maxStartHeap.push(topStart);
+			}
+		}
+		return result;
+	}
+};
+
+//=======================================================================
+
+//
+//子集
+//
+
+//例：
+
+//
+//总结
+// 
+//
+
+//练习：
+
 int main()
 {
 	std::cout << "Hello World!\n";
