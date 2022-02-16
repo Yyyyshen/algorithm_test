@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <string>
+#include <unordered_map>
 using namespace std;
 
 //
@@ -681,14 +683,397 @@ public:
 //子集
 //
 
-//例：
+//例：给定集合，求所有子集
+//时间复杂度O(N*2^N)，遍历所有元素消耗N，每个元素遍历后子集数翻倍消耗2^N
+//空间复杂度O(N*2^N)，每次拷贝出之前的所有子集消耗N，新子集数量翻倍消耗2^N
+class Subsets {
+public:
+	static vector<vector<int>> findSubsets(const vector<int>& nums) {
+		vector<vector<int>> subsets;
+		subsets.push_back(vector<int>());
+		for (auto num : nums)
+		{
+			int size_now = subsets.size();
+			for (int i = 0; i < size_now; ++i)
+			{
+				vector<int> new_subset(subsets[i]);
+				new_subset.push_back(num);
+				subsets.push_back(new_subset);
+			}
+		}
+		return subsets;
+	}
+};
+
+//例：给定集合，可能包含重复数字，找出所有不同子集
+class SubsetWithDuplicates {
+public:
+	static vector<vector<int>> findSubsets(vector<int>& nums) {
+		vector<vector<int>> subsets;
+		//记录每次添加前子集数量，如果下一个是重复元素，跳过前一次处理子集数量的子集
+		int memo = 0;
+		subsets.push_back(vector<int>());
+		for (int i = 0; i < nums.size(); ++i)
+		{
+			int size_now = subsets.size();
+			int j = 0;
+			if (i > 0 && nums[i] == nums[i - 1])
+				j = memo;
+			for (; j < size_now; ++j)
+			{
+				vector<int> set(subsets[j]);
+				set.push_back(nums[i]);
+				subsets.push_back(set);
+			}
+			memo = size_now;
+		}
+		return subsets;
+	}
+};
+
+//例：给定一组数字，找出所有排列
+//与子集类似， 但要包含所有元素
+class Permutations {
+public:
+	static vector<vector<int>> findPermutations(const vector<int>& nums) {
+		vector<vector<int>> result;
+		queue<vector<int>> permutations;
+		permutations.push(vector<int>());
+		for (auto cur : nums)
+		{
+			int n = permutations.size();
+			for (int i = 0; i < n; ++i)
+			{
+				//取出一个之前的组合，准备进行跟新元素组合
+				vector<int> old = permutations.front();
+				permutations.pop();
+				//往旧组合每个拷贝中的不同位置（头、中间、尾）插入新元素，组成新组合
+				for (int j = 0; j <= old.size(); ++j)
+				{
+					vector<int> new_permutations(old);
+					new_permutations.insert(new_permutations.begin() + j, cur);
+					//当组合数与原组大小一致时，填充结果
+					if (new_permutations.size() == nums.size())
+						result.push_back(new_permutations);
+					//否则，装入现有组合列表，准备下一次执行
+					else
+						permutations.push(new_permutations);
+				}
+			}
+		}
+		return result;
+	}
+};
+
+//例：给定字符串，找到所有排列（规则为序列不变但改变大小写）
+//上例变种，每次添加的组合是大小写，数字跳过
+class LetterCaseStringPermutation {
+public:
+	static vector<string> findLetterCaseStringPermutations(const string& str) {
+		vector<string> permutations;
+		if (str.empty()) return permutations;
+		permutations.push_back(str);
+		for (int i = 0; i < str.length(); ++i)
+		{
+			if (isdigit(str[i])) continue;
+			int n = permutations.size();
+			for (int j = 0; j < n; ++j)
+			{
+				string s = permutations[i];
+				if (isupper(s[i]))
+					s[i] = tolower(s[i]);
+				else
+					s[i] = toupper(s[i]);
+				permutations.push_back(s);
+			}
+		}
+
+		return permutations;
+		//答案写法，迭代器效率更高？
+		vector<string> permutations;
+		if (str == "") {
+			return permutations;
+		}
+
+		permutations.push_back(str);
+		// process every character of the string one by one
+		for (int i = 0; i < str.length(); i++) {
+			if (isalpha(str[i])) {  // only process characters, skip digits
+			  // we will take all existing permutations and change the letter case appropriately
+				int n = permutations.size();
+				for (int j = 0; j < n; j++) {
+					vector<char> chs(permutations[j].begin(), permutations[j].end());
+					// if the current character is in upper case change it to lower case or vice versa
+					if (isupper(chs[i])) {
+						chs[i] = tolower(chs[i]);
+					}
+					else {
+						chs[i] = toupper(chs[i]);
+					}
+					permutations.push_back(string(chs.begin(), chs.end()));
+				}
+			}
+		}
+		return permutations;
+	}
+};
+
+//例：给定一个数字N，生成N对平衡括号的所有组合
+//从空集开始，每次向之前的组合中添加左括号或右括号
+//要符合左括号数量小于等于给定N，右括号数小于等于左括号数
+class ParenthesesString {
+public:
+	//定义一个辅助类记录当前左右括号数
+	string str;
+	int openCount = 0;   // open parentheses count
+	int closeCount = 0;  // close parentheses count
+	ParenthesesString(const string& s, int openCount, int closeCount) {
+		this->str = s;
+		this->openCount = openCount;
+		this->closeCount = closeCount;
+	}
+};
+class GenerateParentheses {
+public:
+	static vector<string> generateValidParentheses(int num) {
+		vector<string> result;
+		queue<ParenthesesString> queue;
+		queue.push({ "",0,0 });
+		while (!queue.empty())
+		{
+			ParenthesesString ps = queue.front();
+			queue.pop();
+			//开闭括号数量同时符合条件，添加到结果集
+			if (ps.openCount == num && ps.closeCount == num)
+				result.push_back(ps.str);
+			else
+			{
+				//开括号数量小于组数则可以添加
+				if (ps.openCount < num)
+					queue.push({ ps.str + "(",ps.openCount + 1,ps.closeCount });
+				//比括号数量小于开括号数量则满足括号平衡，可以添加
+				if (ps.closeCount < ps.openCount)
+					queue.push({ ps.str + ")",ps.openCount,ps.closeCount + 1 });
+			}
+		}
+		return result;
+	}
+};
+
+//例：给定一个单词，生成所有通用缩写
+//将单词每个子字符串替换为子字符串中字符数即通用缩写
+//比如“ab”，子字符串有“”“a”“b”“ab”
+//用字符数替换后，得到“ab”“1b”“a1”“2”
+class AbbreviatedWord {
+public:
+	string str;
+	int start = 0;
+	int count = 0;
+
+	AbbreviatedWord(string str, int start, int count) {
+		this->str = str;
+		this->start = start;
+		this->count = count;
+	}
+};
+class GeneralizedAbbreviation {
+public:
+	static vector<string> generateGeneralizedAbbreviation(const string& word) {
+		int wordLen = word.length();
+		vector<string> result;
+		queue<AbbreviatedWord> queue;
+		//从一个空字符开始
+		queue.push({ "", 0, 0 });
+		while (!queue.empty()) {
+			//每次把两个缩写规则应用与上一次的组合
+			AbbreviatedWord abWord = queue.front();
+			queue.pop();
+			if (abWord.start == wordLen) {
+				if (abWord.count != 0) {
+					abWord.str += to_string(abWord.count);
+				}
+				result.push_back(abWord.str);
+			}
+			else {
+				//每个词可以缩写或添加
+				// continue abbreviating by incrementing the current abbreviation count
+				queue.push({ abWord.str, abWord.start + 1, abWord.count + 1 });
+
+				// restart abbreviating, append the count and the current character to the string
+				if (abWord.count != 0) {
+					abWord.str += to_string(abWord.count);
+				}
+				abWord.str += word[abWord.start];
+				queue.push({ abWord.str, abWord.start + 1, 0 });
+			}
+		}
+
+		return result;
+	}
+};
 
 //
 //总结
 // BFS相关问题
+// 要生成集合的所有子集，可以从一个空集开始
+// 遍历所有数字，每次遍历将新数字与现有所有子集组合一遍
+// 最后都添加到现有集合
 //
 
-//练习：
+//练习：给定一个算术表达式，使用括号对数字和运算符分组，找出所有计算方式
+//将等式通过符号分割的形式表示括号，递归计算每部分
+class EvaluateExpression {
+public:
+	static vector<int> diffWaysToEvaluateExpression(const string& input) {
+		vector<int> result;
+		// base case: if the input string is a number, parse and add it to output.
+		if (input.find("+") == string::npos && input.find("-") == string::npos &&
+			input.find("*") == string::npos) {
+			result.push_back(stoi(input));
+		}
+		else
+		{
+			for (int i = 0; i < input.length(); i++)
+			{
+				char chr = input[i];
+				if (!isdigit(chr))
+				{
+					// break the equation here into two parts and make recursively calls
+					vector<int> leftParts = diffWaysToEvaluateExpression(input.substr(0, i));
+					vector<int> rightParts = diffWaysToEvaluateExpression(input.substr(i + 1));
+					for (auto part1 : leftParts)
+					{
+						for (auto part2 : rightParts)
+						{
+							if (chr == '+')
+								result.push_back(part1 + part2);
+							else if (chr == '-')
+								result.push_back(part1 - part2);
+							else if (chr == '*')
+								result.push_back(part1 * part2);
+						}
+					}
+				}
+			}
+		}
+		return result;
+	}
+
+	//备忘录版，用一个hashmap跳过递归中可能重复的情况
+	unordered_map<string, vector<int>> map = unordered_map<string, vector<int>>();
+	virtual vector<int> diffWaysToEvaluateExpression_memo(const string& input) {
+		if (map.find(input) != map.end()) {
+			return map[input];
+		}
+		vector<int> result;
+		// base case: if the input string is a number, parse and return it.
+		if (input.find("+") == string::npos && input.find("-") == string::npos &&
+			input.find("*") == string::npos) {
+			result.push_back(stoi(input));
+		}
+		else {
+			for (int i = 0; i < input.length(); i++) {
+				char chr = input[i];
+				if (!isdigit(chr)) {
+					vector<int> leftParts = diffWaysToEvaluateExpression_memo(input.substr(0, i));
+					vector<int> rightParts = diffWaysToEvaluateExpression_memo(input.substr(i + 1));
+					for (auto part1 : leftParts) {
+						for (auto part2 : rightParts) {
+							if (chr == '+') {
+								result.push_back(part1 + part2);
+							}
+							else if (chr == '-') {
+								result.push_back(part1 - part2);
+							}
+							else if (chr == '*') {
+								result.push_back(part1 * part2);
+							}
+						}
+					}
+				}
+			}
+		}
+		map[input] = result;
+		return result;
+	}
+};
+
+//练习：给定数字n，找出所有可以存储值1~n的结构唯一的二叉搜索树（BST）
+//从1遍历到n，将每个数字作为树的根
+//之后根据BST规则，比根大的依次往右分别放一次，比根小的依次往左放依次
+class UniqueTrees {
+public:
+	static vector<TreeNode*> findUniqueTrees(int n) {
+		if (n <= 0) {
+			return vector<TreeNode*>();
+		}
+		return findUniqueTreesRecursive(1, n);
+	}
+	static vector<TreeNode*> findUniqueTreesRecursive(int start, int end) {
+		vector<TreeNode*> result;
+		// base condition, return 'null' for an empty sub-tree
+		// consider n=1, in this case we will have start=end=1, this means we should have only one tree
+		// we will have two recursive calls, findUniqueTreesRecursive(1, 0) & (2, 1)
+		// both of these should return 'null' for the left and the right child
+		if (start > end) {
+			result.push_back(nullptr);
+			return result;
+		}
+
+		for (int i = start; i <= end; i++) {
+			// making 'i' root of the tree
+			vector<TreeNode*> leftSubtrees = findUniqueTreesRecursive(start, i - 1);
+			vector<TreeNode*> rightSubtrees = findUniqueTreesRecursive(i + 1, end);
+			for (auto leftTree : leftSubtrees) {
+				for (auto rightTree : rightSubtrees) {
+					TreeNode* root = new TreeNode(i);
+					root->left = leftTree;
+					root->right = rightTree;
+					result.push_back(root);
+				}
+			}
+		}
+		return result;
+	}
+};
+
+//练习：给定数字n，找出所有可以存储1~n的结构唯一的BST的计数
+//上题的简化版，不需要构建树，只要计数
+class CountUniqueTrees {
+public:
+	int countTrees(int n) {
+		if (n <= 1) return 1;
+		int count = 0;
+		for (int i = 1; i <= n; i++) {
+			// making 'i' root of the tree
+			int countOfLeftSubtrees = countTrees(i - 1);
+			int countOfRightSubtrees = countTrees(n - i);
+			count += (countOfLeftSubtrees * countOfRightSubtrees);
+		}
+		return count;
+	}
+	//备忘录版本
+	unordered_map<int, int> map = unordered_map<int, int>();
+	virtual int countTrees_memo(int n) {
+		if (map.find(n) != map.end()) {
+			return map[n];
+		}
+
+		if (n <= 1) {
+			return 1;
+		}
+
+		int count = 0;
+		for (int i = 1; i <= n; i++) {
+			// making 'i' root of the tree
+			int countOfLeftSubtrees = countTrees_memo(i - 1);
+			int countOfRightSubtrees = countTrees_memo(n - i);
+			count += (countOfLeftSubtrees * countOfRightSubtrees);
+		}
+		map[n] = count;
+		return count;
+	}
+};
 
 int main()
 {
