@@ -11,7 +11,7 @@ int binary_search(int* arr, size_t n, int value)
 	int low = 0, high = n - 1;
 	while (low <= high)
 	{
-		int mid = low + (high - low) >> 1;//位运算防止越界
+		int mid = low + ((high - low) >> 1);//位运算防止越界，另外注意+优先级大于>>
 		if (arr[mid] == value)
 			return mid;
 		else if (arr[mid] < value)
@@ -28,7 +28,7 @@ int binary_search(int* arr, size_t n, int value)
 	int low = 0, high = n - 1;
 	while (low <= high)
 	{
-		int mid = low + (high - low) >> 1;
+		int mid = low + ((high - low) >> 1);
 		if (arr[mid] >= value)
 		{
 			if (mid == 0 || arr[mid - 1] < value)
