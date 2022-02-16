@@ -686,7 +686,7 @@ binary_search(int* arr, int n, int value)
 
 	while (low <= high)
 	{
-		int mid = low + (high - low) >> 1;//防止越界，并用位移操作代替除法
+		int mid = low + ((high - low) >> 1);//防止越界，并用位移操作代替除法，注意优先级
 		if (arr[mid] == value)
 			return mid;
 		else if (arr[mid] > value)
@@ -704,7 +704,7 @@ binary_search_impl(int* arr, int low, int high, int value)
 {
 	if (low > high) return -1;	//没找到
 
-	int mid = low + (high - low) >> 1;
+	int mid = low + ((high - low) >> 1);
 	if (arr[mid] == value)
 		return mid;
 	else if (arr[mid] > value)
@@ -743,7 +743,7 @@ binary_search_first(int* arr, size_t n, int value)
 {
 	int low = 0, high = n - 1;
 
-	int mid = low + (high - low) >> 1;
+	int mid = low + ((high - low) >> 1);
 	while (low <= high)
 	{
 		if (arr[mid] > value)
