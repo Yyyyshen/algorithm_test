@@ -9,6 +9,8 @@ using namespace std;
 //二分搜索变种
 // 
 //按位异或
+// 
+//Top-K问题
 //
 
 //=======================================================================
@@ -441,6 +443,164 @@ public:
 		return 0;  // the array has not been rotated
 	}
 };
+
+//=======================================================================
+
+//
+//按位异或
+//
+
+//例：给定一个包含从1到n的n-1个整数的数组，找出缺失的那个数
+//最直接的做法是算出1~n的总和，减去所有数字，则是缺失的数字
+//但可能在算总和时超出INT_MAX
+//之前的题目中，这是一个循环排序类型的问题，将数字换到对应的索引上
+//没有对应好的数字就是缺失的数字
+//试想，用本节标题所说的异或，是否能做这道题
+class MissingNumber {
+public:
+	static int findMissingNumber(vector<int>& arr) {
+		//根据异或的特性，相同的数字相互异或会返回0
+		//将每个数字与1~n的所有数字异或，若没有变0的情况，则就是缺失的数字
+		//但要注意，可以避免双层for循环
+		//计算一次从1到n的异或，再计算一次数组中所有数字的异或，两个结果进行异或
+		//则一一对应后，没有缺失的数字都异或为0，而0异或任何数结果都是任何数本身，也就得到了缺失的数字
+		if (arr.empty()) return -1;
+		int n = arr.size() + 1, xor1 = 1, xor2 = arr[0];
+		for (int i = 2; i <= n; ++i)
+			xor1 = xor1 ^ i;
+		for (int i = 1; i < n - 1; ++i)
+			xor2 = xor2 ^ arr[i];
+		return xor1 ^ xor2;
+		//时间复杂度O(N)，与循环排序一样
+	}
+};
+
+//例：在一个非空整数组，除了一个数字之外，所有数字都出现了两次，找到这个数字
+// 正常可能用一个unordered哈希表记录，没记录在内的添加，记录在内的删除，最后剩下的就是结果
+//用异或方法
+// 出现两次，则异或自身为0，而0异或任何数还是任何数本身，所以，从头到位异或一遍就是结果
+class SingleNumber {
+public:
+	static int findSingleNumber(const vector<int>& arr) {
+		int ret = arr[0];//从0开始也是一样的
+		for (int i = 1; i < arr.size(); ++i)
+			ret = ret xor arr[i];
+		return ret;
+	}
+};
+
+//例：一个非空数组中，除了两个数字之外，其他数字都出现了两次，找到这两个数字
+//整个数组异或一遍，会得到两个结果数字的异或值
+class TwoSingleNumbers {
+public:
+	static vector<int> findSingleNumbers(vector<int>& nums) {
+		int n1xn2 = 0;
+		for (int i = 0; i < nums.size(); ++i)
+			n1xn2 = n1xn2 ^ nums[i];
+		//可以取最右边为1的位，根据这个位将数组分为两组
+		//分别对两组中所有数字进行异或，两个结果就是我们要的
+		int rightmostSetBit = 1;
+		while ((rightmostSetBit & n1xn2) == 0)//位与运算，是0就左移一位
+			rightmostSetBit = rightmostSetBit << 1;
+		int num1 = 0, num2 = 0;
+		//为什么任取一个为1的位来区分？******************************
+		// 因为num1和num2不同，则他们至少有一位不同
+		// 则某一位为1，说明两个数字的这个位是不同的
+		// 在这一位上，根据是否为1将数组中所有数字分成两组
+		// 相同的数字这一位一定相同，被分配到同一组，且异或后会相互抵消
+		// 最终，只有num1和num2这两个不同的数字被留到了不同的组中
+		//***********************************************************
+		for (auto num : nums)
+		{
+			if ((num & rightmostSetBit) != 0)
+				num1 ^= num;
+			else
+				num2 ^= num;
+		}
+		return vector<int>{num1, num2};
+	}
+};
+
+//例：对于以10为底的给定正数N，求其按位取反后的值
+//根据异或性质，给定值与结果异或，是一个所有位都为1的值
+//推导
+// num ^ ret = all_bits_set; 两边同时异或上原值
+// num ^ num ^ ret = num ^ all_bits_set; 相同数字异或抵消为0
+// ret = num & all_bits_set; 0异或任何值还是任何值本身
+// 所以，只要找到所有位都是1的数字，与给定值异或就得到了结果
+//计算all_bits_set
+// 首先计算给定值所需的位（右移直到为0，计数）
+// 之后，以2为底做做幂计算再-1就是此位数填满1的数
+// 比如 8 二进制 1000 四位 2的4次方 16 二进制 10000 减1为15 二进制 1111
+// 与原值 8 二进制 1000 异或 结果为 0111 也就是结果 7
+//
+class CalculateComplement {
+public:
+	static int bitwiseComplement(int num) {
+		// count number of total bits in 'num'
+		int bitCount = 0;
+		int n = num;
+		while (n > 0) {
+			bitCount++;
+			n = n >> 1;
+		}
+
+		// for a number which is a complete power of '2' i.e., it can be written as pow(2, n), if we
+		// subtract '1' from such a number, we get a number which has 'n' least significant bits set to
+		// '1'. For example, '4' which is a complete power of '2', and '3' (which is one less than 4)
+		// has a binary representation of '11' i.e., it has '2' least significant bits set to '1'
+		int all_bits_set = pow(2, bitCount) - 1;
+
+		// from the solution description: complement = number ^ all_bits_set
+		return num ^ all_bits_set;
+	}
+};
+
+//
+//总结
+// 异或是逻辑位运算，两位相同则返回0，不同返回1
+// 常用特性有
+// 数字异或自身返回0
+// 数字异或0返回自身
+// 支持交换律和结合律
+// 
+// 在一些特定问题中，这是一种有趣的解决方案
+//
+
+//练习：给定表示图像的二进制矩阵，水平翻转图像然后将其反转
+//水平翻转就是二进制矩阵根据中轴，左右两边数交换，具体到每一行，就是[0,0,1]翻为{1,0,0]
+//反转图像就是每个数字取反，从0变1、从1变0
+class Solution {
+public:
+	static vector<vector<int>> flipAndInvertImage(vector<vector<int>> arr) {
+		//翻转是每行从0和size-1开始挨个交换
+		//反转是挨个异或
+		int s = arr[0].size();
+		for (int row = 0; row < arr.size(); row++) {
+			for (int col = 0; col < (s + 1) / 2; ++col) {
+				int tmp = arr[row][col] ^ 1;
+				arr[row][col] = arr[row][s - 1 - col] ^ 1;
+				arr[row][s - 1 - col] = tmp;
+			}
+		}
+		return arr;
+	}
+
+	static void print(const vector<vector<int>> arr) {
+		for (int i = 0; i < arr.size(); i++) {
+			for (int j = 0; j < arr[i].size(); j++) {
+				cout << arr[i][j] << " ";
+			}
+			cout << endl;
+		}
+	}
+};
+
+//=======================================================================
+
+//
+//按位异或
+//
 
 int main()
 {
