@@ -93,6 +93,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "grokking_04", "grokking_04\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "grokking_05", "grokking_05\grokking_05.vcxproj", "{F61F27C1-E160-48A8-BF53-AFBA9B679F43}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "grokking_06", "grokking_06\grokking_06.vcxproj", "{8AE501EE-2519-4731-AF44-38934EF16750}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -397,6 +399,14 @@ Global
 		{F61F27C1-E160-48A8-BF53-AFBA9B679F43}.Release|x64.Build.0 = Release|x64
 		{F61F27C1-E160-48A8-BF53-AFBA9B679F43}.Release|x86.ActiveCfg = Release|Win32
 		{F61F27C1-E160-48A8-BF53-AFBA9B679F43}.Release|x86.Build.0 = Release|Win32
+		{8AE501EE-2519-4731-AF44-38934EF16750}.Debug|x64.ActiveCfg = Debug|x64
+		{8AE501EE-2519-4731-AF44-38934EF16750}.Debug|x64.Build.0 = Debug|x64
+		{8AE501EE-2519-4731-AF44-38934EF16750}.Debug|x86.ActiveCfg = Debug|Win32
+		{8AE501EE-2519-4731-AF44-38934EF16750}.Debug|x86.Build.0 = Debug|Win32
+		{8AE501EE-2519-4731-AF44-38934EF16750}.Release|x64.ActiveCfg = Release|x64
+		{8AE501EE-2519-4731-AF44-38934EF16750}.Release|x64.Build.0 = Release|x64
+		{8AE501EE-2519-4731-AF44-38934EF16750}.Release|x86.ActiveCfg = Release|Win32
+		{8AE501EE-2519-4731-AF44-38934EF16750}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -438,6 +448,7 @@ Global
 		{48C114D8-FD4E-49E9-B803-3D67D853D8BE} = {DE4DDB7D-3A73-4E39-B29E-38B425A69846}
 		{E1E98C12-794F-489C-BAC5-FB8849FD7624} = {DE4DDB7D-3A73-4E39-B29E-38B425A69846}
 		{F61F27C1-E160-48A8-BF53-AFBA9B679F43} = {DE4DDB7D-3A73-4E39-B29E-38B425A69846}
+		{8AE501EE-2519-4731-AF44-38934EF16750} = {DE4DDB7D-3A73-4E39-B29E-38B425A69846}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C268B8F3-3579-487E-852E-000EEF225BF5}
