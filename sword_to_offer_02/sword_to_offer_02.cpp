@@ -2,6 +2,11 @@
 //
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
+#include <unordered_map>
+#include <stack>
+#include <queue>
 using namespace std;
 
 //
@@ -20,6 +25,63 @@ test_raw_arr()
 	std::cout << "data[] size : " << sizeof(data) << std::endl	//20
 		<< "p_data size : " << sizeof(p_data) << std::endl		//4
 		<< "GetSize(data[]) : " << GetSize(data) << std::endl;	//4 当数组作为函数参数传递时，自动退化成同类型指针
+}
+//
+//面试题：数组中重复数字（缺失数字）
+// 长度n的数组，数字范围0~n-1，某些数字是重复的
+class DuplicateNumbers
+{
+public:
+	static vector<int> find_dup_num(/* const */vector<int> nums)
+	{
+		vector<int> ret;
+		//参数检查
+		if (nums.empty() || nums.size() <= 1)
+			return ret;
+		//检查输入是否有问题（若求缺失数字则不需要这一步）
+		for (auto num : nums)
+			if (num <0 || num > nums.size() - 1)
+				return ret;
+		//方案1，排序后遍历一遍求结果，时间O(nlogn)，空间O(1)，输入被修改
+		sort(nums.begin(), nums.end());
+		for (int i = 0; i < nums.size() - 1; ++i)
+			if (nums[i] == nums[i + 1])
+				ret.push_back(nums[i]);
+		//方案2，hashmap辅助记录，时间O(n)，空间O(n)，输入未修改
+		unordered_map<int, int> memo;
+		for (auto num : nums)
+		{
+			if (memo.find(num) != memo.end())
+				ret.push_back(num);
+			else
+				++memo[num];
+		}
+		//方案3，根据数值与索引位置原地循环排序，时间O(n)，空间O(1)，输入被修改
+		int i = 0;
+		while (i < nums.size())
+		{
+			if (nums[i] >= 0 && nums[i] < nums.size() && nums[i] != nums[nums[i]])
+				swap(nums[i], nums[nums[i]]);
+			else
+				++i;
+		}
+		for (i = 0; i < nums.size(); ++i)
+			if (nums[i] != i)
+				ret.push_back(nums[i]);
+		//方案4，借助二分思路，取中间数m，计数1~m和m+1~n之间的数字，哪边数字多重复的就在哪边
+		//时间O(nlogn)，空间O(1)，输入不被修改
+		//问题：如果两范围各重复一个，怎么区分？
+
+		return ret;
+	}
+};
+void test_DuplicateNumbers()
+{
+	auto ret = DuplicateNumbers::find_dup_num({ 2,3,1,0,2,5,3 });
+	cout << "test_DuplicateNumbers ret: ";
+	for (auto num : ret)
+		cout << num << " ";
+	cout << endl;
 }
 // 
 //例
@@ -138,6 +200,150 @@ void replace_spaces()
 
 //
 //链表
+//
+class ListNode
+{
+public:
+	int value;
+	ListNode* next;
+	ListNode(int val) :value(val), next(nullptr) {}
+};
+//面试题：从尾到头打印链表
+// 分析，问清条件，是否改变输入
+// 如果可以，则反转链表，打印后再反转回来
+// 若打印过程中要求完全不改变链表结构，则借助一个栈，遍历过程中入栈
+class PrintLinkedListReversedOrder
+{
+public:
+	static void print(ListNode* head)
+	{
+		stack<ListNode*> st;
+		ListNode* cur = head;
+		while (cur != nullptr)
+		{
+			st.push(cur);
+			cur = cur->next;
+		}
+		while (!st.empty())
+		{
+			ListNode* top = st.top();
+			cout << top->value << " ";
+			st.pop();
+		}
+		cout << endl;
+	}
+	//另外，调用栈本身也可以起到相同的作用，也就是递归
+	static void printRecursive(ListNode* head)
+	{
+		if (head == nullptr)
+			return;
+		printRecursive(head->next);
+		cout << head->value << " ";
+	}
+};
+void test_PrintLinkedListReversedOrder()
+{
+	ListNode* head = new ListNode(0);
+	head->next = new ListNode(1);
+	head->next->next = new ListNode(2);
+	head->next->next->next = new ListNode(3);
+	//递归只是代码简洁，但如果层级过深，会栈溢出，还是基于栈的循环实现更好
+	PrintLinkedListReversedOrder::printRecursive(head);
+}
+//  
+
+//
+//树
+// 基本都是二叉树
+// 三种根序遍历方式 前序、中序、后序
+// 两种维度遍历 深度优先、广度优先
+// 
+// 二叉树特例
+// 二叉搜索树、堆、红黑树
+// 
+class tree_node
+{
+public:
+	int value;
+	tree_node* left;
+	tree_node* right;
+	tree_node(int val) :value(val), left(nullptr), right(nullptr) {}
+};
+//面试题：根据二叉树的前序、中序遍历重建二叉树
+// 分析，根据前序遍历，第一个元素为根元素
+// 找根元素在中序遍历中的位置，其左侧的所有元素为左子树元素
+// 后续依次递归
+class CtorBinaryTree
+{
+public:
+	static tree_node* ctor(const vector<int>& preorder, const vector<int>& inorder)
+	{
+		if (preorder.empty() || inorder.empty() || preorder.size() != inorder.size())
+			return nullptr;
+		return ctor_core(preorder, inorder, 0, preorder.size() - 1, 0, inorder.size());
+	}
+	static tree_node* ctor_core(const vector<int>& preorder, const vector<int>& inorder,
+		int startpre, int endpre, int startin, int endin)
+	{
+		//前序遍历第一个元素为根节点
+		int rootval = preorder[startpre];
+		//构建根节点
+		tree_node* root = new tree_node(rootval);
+		//已经没有左右子树了（到达叶子节点），返回构建的节点
+		if (startpre == endpre)
+		{
+			if (startin == endin && preorder[startpre] == inorder[startin])
+				return root;
+			else
+				throw std::exception("error input");
+		}
+		//否则在中序遍历中找根节点的位置
+		int rootinorder = startin;
+		while (rootinorder <= endin && inorder[rootinorder] != rootval)
+			++rootinorder;
+		//检查是否找到
+		if (rootinorder == endin && inorder[rootinorder] != rootval)
+			throw std::exception("error input");
+		//确定左右子树两数组的位置
+		int leftlen = rootinorder - startin;
+		int leftendpre = startpre + leftlen;
+		//构建左右子树
+		if (leftlen > 0)
+			root->left = ctor_core(preorder, inorder, startpre + 1, leftendpre, startin, rootinorder - 1);
+		if (leftlen < endpre - startpre)
+			root->right = ctor_core(preorder, inorder, leftendpre + 1, endpre, rootinorder + 1, endin);
+		//返回最终结果
+		return root;
+	}
+	static void print_tree(tree_node* root)
+	{
+		//层序遍历输出
+		if (root == nullptr) return;
+		queue<tree_node*> q;
+		q.push(root);
+		while (!q.empty())
+		{
+			int level_size = q.size();
+			for (int i = 0; i < level_size; ++i)
+			{
+				tree_node* node = q.front();
+				q.pop();
+				cout << node->value << " ";
+				if (node->left != nullptr)
+					q.push(node->left);
+				if (node->right != nullptr)
+					q.push(node->right);
+			}
+			cout << endl;
+		}
+	}
+};
+void test_CtorBinaryTree()
+{
+	tree_node* root = CtorBinaryTree::ctor({ 1,2,4,7,3,5,6,8 }, { 4,7,2,1,5,3,8,6 });
+	CtorBinaryTree::print_tree(root);
+}
+//  
 //
 
 int main()
