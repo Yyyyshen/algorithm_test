@@ -267,7 +267,8 @@ public:
 	int value;
 	tree_node* left;
 	tree_node* right;
-	tree_node(int val) :value(val), left(nullptr), right(nullptr) {}
+	tree_node* parent;
+	tree_node(int val) :value(val), left(nullptr), right(nullptr), parent(nullptr) {}
 };
 //面试题：根据二叉树的前序、中序遍历重建二叉树
 // 分析，根据前序遍历，第一个元素为根元素
@@ -344,6 +345,118 @@ void test_CtorBinaryTree()
 	CtorBinaryTree::print_tree(root);
 }
 //  
+//面试题：给一个树节点，找出二叉树中序遍历的下一个节点
+// 分析，给定节点包含父节点指针，不知道树根，所以不是用正常的中序递归遍历
+class GetNextNode
+{
+public:
+	tree_node* solution(tree_node* node)
+	{
+		tree_node* next = nullptr;
+		//参数检查
+		if (node == nullptr)
+			return next;
+		//最简单情况，有右子树，那么找右子树的最左节点
+		if (node->right != nullptr)
+		{
+			tree_node* tmp = node->right;
+			while (tmp->left != nullptr)
+				tmp = tmp->left;
+			next = tmp;
+		}
+		//没右子树，则向上找一个是其父节点左子节点的节点，下一个节点就是其父节点
+		else if (node->parent != nullptr)
+		{
+			tree_node* cur = node;
+			tree_node* pcur = node->parent;
+			//也可能自己就是其父节点的左子节点
+			while (pcur != nullptr && cur == pcur->right)
+			{
+				cur = pcur;
+				pcur = cur->parent;
+			}
+			//找到的父节点就是下一个节点
+			next = pcur;
+		}
+		//如果没有进两种情况，那就是树的最后一个节点，没有下个节点
+		return next;
+	}
+};
+//
+
+//
+//栈和队列
+// 
+//面试题：两个栈实现队列
+class QueueWithTwoStack final
+{
+public:
+	QueueWithTwoStack() = default;
+	~QueueWithTwoStack() = default;
+public:
+	void push(int val)
+	{
+		//每次把所有元素压到另一个栈
+		while (!q.empty())
+		{
+			helper.push(q.top());
+			q.pop();
+		}
+		//把新元素压到栈底，也就相当于队列尾
+		q.push(val);
+		//把辅助栈里所有元素再压回来，每次保证栈顶是队列头
+		while (!helper.empty())
+		{
+			q.push(helper.top());
+			helper.pop();
+		}
+	}
+	int pop()
+	{
+		int top = q.top();
+		q.pop();
+		return top;
+	}
+	//上面方法每次都要搬两次所有元素，实质是只用到了一个栈，另一个栈只发挥了临时变量的作用
+	//优化，只在有需要的时候搬移一次
+	void push2(int val)
+	{
+		//每次往一个栈里压
+		q.push(val);
+	}
+	int pop2()
+	{
+		//弹出时，把所有元素往辅助栈搬一次，就是队列的顺序了
+		//需要注意的就是，必须辅助栈为空，也就是每轮所有元素都处理完，才搬过来，否则顺序就被改变了
+		if (helper.empty())
+		{
+			while (!q.empty())
+			{
+				helper.push(q.top());
+				q.pop();
+			}
+		}
+		//验证一下栈是否是空
+		if (helper.empty())
+			throw "queue is empty";
+		//正常从辅助栈顶依次返回，直到为空，把下一批数据再压进来，这样减少了很多搬移次数
+		int top = helper.top();
+		helper.pop();
+		return top;
+	}
+private:
+	stack<int> q;
+	stack<int> helper;
+};
+//两个队列实现栈是类似的思路
+// 每次往一个队列入队
+// 弹栈时，将插入元素的队列元素依次出队并插入另一个队列，直到只剩一个元素
+// 再插入时，往已经有元素的队列中插入
+// 以这个逻辑进行
+//
+
+//
+//
 //
 
 int main()
