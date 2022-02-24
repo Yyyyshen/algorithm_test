@@ -98,7 +98,7 @@ void merge_impl(int* arr, int p, int q, int r)
 		for (; j <= r;)
 			tmp[k++] = arr[j++];
 	else
-		for (; i <= i;)
+		for (; i <= q;)
 			tmp[k++] = arr[i++];
 	//应用到原数组
 	memcpy(arr + p, tmp, (r - p + 1) * sizeof(int));
