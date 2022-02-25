@@ -456,10 +456,463 @@ private:
 //
 
 //
+//算法和数据操作
+// 归并排序、快速排序、二分查找 熟练
+class MergeSort final
+{
+public:
+	//归并是先分再排
+	static void run(vector<int>& arr)
+	{
+		sort_impl(arr, 0, arr.size() - 1);
+	}
+private:
+	//先划分块
+	static void sort_impl(vector<int>& arr, int p, int r)
+	{
+		//不能再分
+		if (p >= r)
+			return;
+		//按中点分割
+		int q = (p + r) / 2;
+		//继续对两边划分
+		sort_impl(arr, p, q);
+		sort_impl(arr, q + 1, r);
+		//合并
+		merge_impl(arr, p, q, r);
+	}
+	//有序合并两部分数组
+	static void merge_impl(vector<int>& arr, int p, int q, int r)
+	{
+		vector<int> tmp(r - p + 1);
+		int i, j, k;
+		//相当于两点法合并两个有序数组
+		for (i = p, j = q + 1, k = 0; i <= q && j <= r;)
+		{
+			if (arr[i] < arr[j])
+				tmp[k++] = arr[i++];
+			else
+				tmp[k++] = arr[j++];
+		}
+		//处理可能某一边多出来的部分
+		while (i <= q)
+			tmp[k++] = arr[i++];
+		while (j <= r)
+			tmp[k++] = arr[j++];
+		//把合并结果应用回原数组
+		copy(tmp.begin(), tmp.end(), arr.begin() + p);
+	}
+};
+class QuickSort final
+{
+public:
+	//快排是先排再分
+	static void run(vector<int>& arr)
+	{
+		sort_impl(arr, 0, arr.size() - 1);
+	}
+private:
+	static void sort_impl(vector<int>& arr, int start, int end)
+	{
+		//不能再分
+		if (start >= end)
+			return;
+		//简单排序后找分界点
+		int div = partition(arr, start, end);
+		//在分界点两边再排序
+		if (div > start)
+			sort_impl(arr, start, div - 1);
+		if (div < end)
+			sort_impl(arr, div + 1, end);
+	}
+	static int partition(vector<int>& arr, int start, int end)
+	{
+		//随机/任取一个分界，以取最后一个为例
+		int i = start, div = start;
+		for (; i < end; ++i)
+		{
+			//比标志点小的，往左半边放，交换后大的自动处于后半部分
+			if (arr[i] < arr[end])
+			{
+				swap(arr[i], arr[div]);
+				++div;
+			}
+		}
+		//把标志点换到正确位置
+		swap(arr[div], arr[end]);
+		return div;
+	}
+};
+class BinarySearch final
+{
+public:
+	//二分
+	static int run(const vector<int>& arr, int val)
+	{
+		if (arr.empty()) return -1;
+		return search_impl(arr, val);
+	}
+private:
+	static int search_impl(const vector<int>& arr, int val)
+	{
+		int start = 0, end = arr.size() - 1, mid = 0;
+		while (start <= end)
+		{
+			//找中点，注意加法可能溢出，另外注意位移符优先级
+			mid = start + ((end - start) >> 1);
+			if (arr[mid] == val)
+				return mid;
+			//考虑升降序
+			if (arr[0] < arr[arr.size() - 1])
+			{
+				if (arr[mid] > val)
+					end = mid - 1;
+				else
+					start = mid + 1;
+			}
+			else
+			{
+				if (arr[mid] > val)
+					start = mid + 1;
+				else
+					end = mid - 1;
+			}
+		}
+		return -1;
+	}
+};
+// 
+// 快排是平均效率最好，O(nlogn)
+// 但也可能退化，要根据具体情况分析
+//可能的面试过程
+// 要求实现排序算法，要求效率O(n)
+// 此时应问好，什么使用场景，是否可使用辅助内存
+// 例如对员工年龄排序，可以使用O(n)大小的空间
+// 那么可以分析，员工年龄范围并不大，可以使用桶排序
+// 定义一个大小100的数组，每个元素是一个员工对象数组/链表
+// 这样数组的索引就自然的将员工年龄排序了
+// 只需要遍历一遍员工，根据年龄放到对应索引就排好了
+// 
+//面试题：旋转数组的最小数字
+// 一个递增数组经过旋转，找到其最小元素
+// （最基本的是遍历一遍，时间O(n)，但可以更快）
+// 分析，旋转后最小元素有一个特性，它是数组中唯一一个比前一个元素小的
+// 另外，可以使用二分，根据递增，可知旋转点一定存在于右端点小于左端点的区间
+// 时间复杂度降到O(logn)
+class FindSmallestInRotatedArray final
+{
+public:
+	static int run(const vector<int>& arr)
+	{
+		if (arr.empty()) return -1;
+		int start = 0, end = arr.size() - 1, mid = 0;
+		while (start < end)
+		{
+			mid = start + ((end - start) >> 1);
+			//比较前后各一个元素，可知结果
+			if (mid > start && arr[mid] < arr[mid - 1])
+				return arr[mid];
+			if (mid < end && arr[mid] > arr[mid + 1])
+				return arr[mid + 1];
+			//重复元素判断
+			if (arr[mid] == arr[start] && arr[mid] == arr[end])
+			{
+				//分别移动一次，但可以顺便看看是否能从移动的两个点找到结果
+				if (arr[start] > arr[start + 1])
+					return arr[start + 1];
+				++start;
+				if (arr[end] < arr[end - 1])
+					return arr[end];
+				--end;
+			}
+			//判断最小元素所在位置
+			else if (arr[start] < arr[mid] || (arr[start] == arr[mid] && arr[mid] > arr[end]))
+				start = mid + 1;
+			else
+				end = mid - 1;
+		}
+		//没在中间找到，说明是旋转0或数组大小倍数次，最小的是首元素
+		return arr[0];
+	}
+};
 //
+//递归
+// 优点 代码简洁，在树遍历应用中更容易实现
+// 缺点 每次调用都是对栈空间的占用，分配、传参等操作也增加时间，层级过多时还会栈溢出
+// 
+//面试题：斐波那契数列
+class Fibonacci final
+{
+public:
+	static int recursive(int n)
+	{
+		//递归方式简单，但效率低，因为根据递归树，很多支路是重复的
+		if (n <= 0) return 0;
+		if (n == 1) return 1;
+		return recursive(n - 1) + recursive(n - 2);
+	}
+	//迭代方式
+	static int iterative(int n)
+	{
+		if (n <= 0) return 0;
+		if (n == 1) return 1;
+		//记录每次结果
+		int first = 0, second = 1;
+		int fibN = 0;
+		for (int i = 2; i <= n; ++i)
+		{
+			fibN = first + second;
+			first = second;
+			second = fibN;
+		}
+		return fibN;
+	}
+	//变种，跳台阶，N阶台阶，一次走一阶或两阶，多少种走法；本质上还是f(n) = f(n-1)+f(n-2);
+	static int jump(int n)
+	{
+		if (n <= 0) return 0;
+		if (n == 1) return 1;
+		//也可用额外空间记录前面数字
+		vector<int> fib = { 1,1 };//此例应从1开始，而不是0
+		for (int i = 2; i <= n; ++i)
+			fib.push_back(fib[i - 1] + fib[i - 2]);
+		return fib[n];
+	}
+};
+// 
+//回溯法
+// 对于每个步骤都有多个选项的问题，可以使用回溯进行枚举操作
+// 
+//面试题：矩阵中的路径
+// 判断一个矩阵中是否存在一条包含某字符串所有字符的路径
+// 分析
+// 在矩阵任选一个格子作为起点，找相邻的几个格子，并做记录已经到达过的格子
+class HasPath final
+{
+public:
+	static bool run(const vector<vector<int>>& matrix, const char* str)
+	{
+		//参数检查，还可以检查各子数组长度是否相等
+		if (matrix.empty() || str == nullptr) return false;
+		//记录到达过的位置
+		vector<vector<bool>> visited(matrix.size(), vector<bool>(matrix[0].size(), false));
+		//记录路径长，用于判断字符串各字符
+		int len = 0;
+		//从所有格子作为起点分别计算一次
+		for (int row = 0; row < matrix.size(); ++row)
+			for (int col = 0; col < matrix[0].size(); ++col)
+				if (core(matrix, row, col, str, len, visited))
+					return true;
+		return false;
+	}
+private:
+	static bool core(const vector<vector<int>>& matrix, int row, int col,
+		const char* str, int& len, vector<vector<bool>>& visited)
+	{
+		//找到字符串尾，返回true
+		if (str[len] == '\0') return true;
+		bool ret = false;
+		//在矩阵范围内、当前字母所在路径长符合字符串中位置、且未访问过，可以继续
+		if (row >= 0 && row < matrix.size() && col >= 0 && col < matrix[0].size()
+			&& matrix[row][col] == str[len]
+			&& visited[row][col] == false)
+		{
+			//路径长+1
+			++len;
+			//本位置记录为已访问
+			visited[row][col] = true;
+			//往上下左右四个方向找，参数判断会在下一层验证
+			ret = core(matrix, row - 1, col, str, len, visited)
+				|| core(matrix, row + 1, col, str, len, visited)
+				|| core(matrix, row, col - 1, str, len, visited)
+				|| core(matrix, row, col + 1, str, len, visited);
+			//若没找到，路径长减回来，标记未访问，保证当前栈层状态
+			if (ret == false)
+			{
+				--len;
+				visited[row][col] = false;
+			}
+		}
+		return ret;
+	}
+};
+// 
+//面试题：机器人运动范围
+// m*n的方格，机器人从坐标(0,0)开始，每次可以上下左右走一格
+// 但不能进入行列坐标数位之和大于k的格子
+// 分析
+// 与上题类似，回溯
+class RobotMoving final
+{
+public:
+	//并不真正需要矩阵数组，只是给定一个数组范围就可以解此题了
+	static int run(int k, int m, int n)
+	{
+		//参数检查
+		if (k < 0 || m <= 0 || n <= 0)
+			return 0;
+		//标记已到达
+		vector<vector<bool>> visited(m, vector<bool>(n, false));
+		return count(k, m, n, 0, 0, visited);
+	}
+private:
+	static int count(int k, int m, int n,
+		int x, int y, vector<vector<bool>>& visited)
+	{
+		int ret = 0;
+		//满足当前坐标满足条件才继续移动
+		if (check(k, m, n, x, y, visited))
+		{
+			//标记已访问
+			visited[x][y] = true;
+			cout << "(" << x << "," << y << ")" << endl;
+			//往四个方向走
+			ret = 1 + count(k, m, n, x - 1, y, visited)
+				+ count(k, m, n, x + 1, y, visited)
+				+ count(k, m, n, x, y - 1, visited)
+				+ count(k, m, n, x, y + 1, visited);
+		}
+		return ret;
+	}
+	//检查是否坐标数位和小于等于k
+	static bool check(int k, int m, int n,
+		int x, int y, vector<vector<bool>>& visited)
+	{
+		//矩阵范围验证、数位和验证、是否访问过验证
+		if (x >= 0 && x < m && y >= 0 && y < n
+			&& digit_sum(x) + digit_sum(y) <= k
+			&& visited[x][y] == false)
+			return true;
+		return false;
+	}
+	//计算数位和
+	static int digit_sum(int num)
+	{
+		int ret = 0;
+		while (num > 0)
+		{
+			ret += num % 10;
+			num /= 10;
+		}
+		return ret;
+	}
+};
+// 
+//动态规划和贪婪算法
+// 若一个问题是求最优解，且该问题能分解成子问题
+// 子问题之间又有重叠，可以考虑动态规划
+// 若问题除了动态规划还暗示可以用贪婪，则需要从数学角度证明贪婪的正确性
+// 
+//面试题：剪绳子
+// 长度为n的绳子，剪成若干段，求怎么剪使各段绳子乘积最大
+class CutRopeMaxProduct final
+{
+public:
+	//动态规划解法，分解为子问题
+	static int run_dp(int length)
+	{
+		//长度要大于1才会有乘积
+		if (length < 2) return 0;
+		//长度为2，剪成两段1
+		if (length == 2) return 1;
+		//长度为3，剪成两段1和2
+		if (length == 3) return 2;
+		//存放乘积最大结果
+		vector<int> products(length + 1, 0);
+		//预设一些短绳子长度
+		for (int i = 0; i <= 3; ++i)
+			products[i] = i;
+		//每次剪绳子都是把一段分为两段，求两段的乘积最大
+		//抽象为子问题
+		for (int i = 4; i <= length; ++i)
+			//一分为2，只需要算到一半的数量，后面半边是重复的
+			for (int j = 1; j <= i / 2; ++j)
+				products[i] = max(products[i], products[j] * products[i - j]);
+		//数组每个元素都是记录索引值长度的最大乘积情况
+		return products[length];
+	}
+	//贪婪算法
+	static int run_greedy(int length)
+	{
+		//一样的基本参数检查和简单解
+		if (length < 2) return 0;
+		if (length == 2) return 1;
+		if (length == 3) return 2;
+		//n>=5时，尽可能多剪长度为3的绳子，剩下长度4时，剪成两段2
+		int len3nums = length / 3;
+		//如果能剪到1，那最后一段4应该剪成2*2，而不是3*1
+		if (length - len3nums * 3 == 1)
+			--len3nums;
+		int len2nums = (length - len3nums * 3) / 2;
+		return (int)pow(3, len3nums) * (int)pow(2, len2nums);
+		//正确性证明
+		// n>=5时
+		// 2(n-2) 和 3(n-3) 都大于n，所以绳子长度大于等于5时，剪成3或者2的段
+		// 又可推出 3(n-3)>=2(n-2)，所以尽可能多剪3
+		// 长度为4时，2*2>1*3，剪成2*2最好
+	}
+};
+// 
+//位运算
+// 与&、或|、异或^、左移<<、右移>>
+//
+//面试题：二进制中1的个数
+// 实现一个函数，输入整数，输出其二进制表示中1的个数
+class CountOneInBinary
+{
+public:
+	static int run(int number)
+	{
+		int ret = 0;
+		//先算出数字在二进制中多少位
+		int n = number, bits = 0;
+		while (n != 0)
+		{
+			n = n >> 1;
+			bits++;
+		}
+		//用一个标志按位对比
+		int flag = 1;
+		for (int i = 0; i < bits; ++i)
+		{
+			if ((number & flag) != 0)
+				ret++;
+			flag = flag << 1;
+		}
+		return ret;
+	}
+	//更巧妙的解法
+	// 一个整数不是0的话，二进制中一定有1
+	// 假设最右一位是1，这个数字减1，最右就是0
+	// 其他位保持不变，最后一位相当于取反操作
+	// 继续分析，最后一位是0，假设下一个最右的1在m位
+	// 继续减1时，m位变0，m右边位全变1
+	// 所以
+	// 一个整数减1，在和原数做与运算，会把整数最右边的1变为0
+	// 那么有多少个1，就能进行多少次这样的运算
+	static int run_smart(int number)
+	{
+		int ret = 0;
+		while (number!=0)
+		{
+			++ret;
+			number = (number - 1) & number;
+		}
+		return ret;
+	}
+};
+//
+
+//
+//本章总结
+// 基础知识：编程语言、数据结构、算法
+// 语言上注重概念、代码分析、编程
+// 数据结构重点为数组和字符串、二叉树、栈和队列
+// 算法重点为二分查找、归并和快排、回溯、动态、贪心
+// 位运算一般用于巧妙的数字题解法
 //
 
 int main()
 {
-	std::cout << "Hello World!\n";
+
 }
