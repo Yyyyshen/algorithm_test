@@ -95,6 +95,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "grokking_05", "grokking_05\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "grokking_06", "grokking_06\grokking_06.vcxproj", "{8AE501EE-2519-4731-AF44-38934EF16750}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sword_to_offer_03", "sword_to_offer_03\sword_to_offer_03.vcxproj", "{1FA85CA5-4A24-4AF5-993E-6DCF18BF6FF0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -407,6 +409,14 @@ Global
 		{8AE501EE-2519-4731-AF44-38934EF16750}.Release|x64.Build.0 = Release|x64
 		{8AE501EE-2519-4731-AF44-38934EF16750}.Release|x86.ActiveCfg = Release|Win32
 		{8AE501EE-2519-4731-AF44-38934EF16750}.Release|x86.Build.0 = Release|Win32
+		{1FA85CA5-4A24-4AF5-993E-6DCF18BF6FF0}.Debug|x64.ActiveCfg = Debug|x64
+		{1FA85CA5-4A24-4AF5-993E-6DCF18BF6FF0}.Debug|x64.Build.0 = Debug|x64
+		{1FA85CA5-4A24-4AF5-993E-6DCF18BF6FF0}.Debug|x86.ActiveCfg = Debug|Win32
+		{1FA85CA5-4A24-4AF5-993E-6DCF18BF6FF0}.Debug|x86.Build.0 = Debug|Win32
+		{1FA85CA5-4A24-4AF5-993E-6DCF18BF6FF0}.Release|x64.ActiveCfg = Release|x64
+		{1FA85CA5-4A24-4AF5-993E-6DCF18BF6FF0}.Release|x64.Build.0 = Release|x64
+		{1FA85CA5-4A24-4AF5-993E-6DCF18BF6FF0}.Release|x86.ActiveCfg = Release|Win32
+		{1FA85CA5-4A24-4AF5-993E-6DCF18BF6FF0}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -449,6 +459,7 @@ Global
 		{E1E98C12-794F-489C-BAC5-FB8849FD7624} = {DE4DDB7D-3A73-4E39-B29E-38B425A69846}
 		{F61F27C1-E160-48A8-BF53-AFBA9B679F43} = {DE4DDB7D-3A73-4E39-B29E-38B425A69846}
 		{8AE501EE-2519-4731-AF44-38934EF16750} = {DE4DDB7D-3A73-4E39-B29E-38B425A69846}
+		{1FA85CA5-4A24-4AF5-993E-6DCF18BF6FF0} = {E224AB14-40E3-4CEB-A6D4-C0E1D3DAE103}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C268B8F3-3579-487E-852E-000EEF225BF5}
