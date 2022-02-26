@@ -190,6 +190,166 @@ private:
 	}
 };
 // 
+//面试题：删除链表节点
+// 给定链表头和节点指针，O(1)时间内删除节点
+class ListNode final
+{
+public:
+	int value;
+	ListNode* next;
+	ListNode(int val) :value(val), next(nullptr) {}
+};
+class DeleteSingleLinkedListNode final
+{
+public:
+	static void run(ListNode* head, ListNode* del)
+	{
+		//从链表头遍历，直到找到下一个节点是待删除节点，时间O(n)，不符合条件
+		//遍历寻找是因为需要前一个节点，可以换个思路
+		//把待删除节点下一个节点值赋给自己，然后删除下一个节点，效果与删除自己相同
+		//但如果要删除的已经是尾元素，则还是需要正常操作遍历一遍，没有别的办法
+		//若删除的是链表唯一一个节点，则还需要把头节点置空
+		//其实还应考虑被删除点是否在链上，此题应是默认了这一点
+
+		//参数检查
+		if (head == nullptr || del == nullptr) return;
+		//要删除的不是尾节点，时间复杂度O(1)
+		if (del->next != nullptr)
+		{
+			ListNode* tmp = del->next;
+			del->value = tmp->value;
+			del->next = tmp->next;
+			delete tmp;
+			tmp = nullptr;
+		}
+		//要删除的是尾节点，且还是头节点
+		else if (del == head)
+		{
+			delete del;
+			del = nullptr;
+			head = nullptr;
+		}
+		//要删除的是尾节点，常规删除
+		{
+			ListNode* prev = head;
+			while (/* prev->next != nullptr && */prev->next != del)
+				prev = prev->next;
+			prev->next = nullptr;
+			delete del;
+			del = nullptr;
+		}
+	}
+};
+// 
+//面试题：正则表达式匹配
+// 字符.表示任意一个字符，字符*表示前面字符可以出现任意次（含0）
+// 例如 aaa 匹配 a.a 或 ab*ac*a
+// 分析
+// 每次拿出一个字符和模式串匹配
+// 模式串对应字符为 . 则匹配任意字符
+// 不是 . 但和主串拿出字符相同，匹配
+// 若不匹配，看模式串第二个字符
+// 如果不是*，则不匹配
+// 如果是*，往模式串后继续对比
+class MatchRegex final
+{
+public:
+	static bool run(char* str, char* pattern)
+	{
+		//参数检查
+		if (str == nullptr || pattern == nullptr) return false;
+		return core(str, pattern);
+	}
+private:
+	static bool core(char* str, char* pattern)
+	{
+		//成功比对到了最后，匹配
+		if (*str == '\0' && *pattern == '\0')
+			return true;
+		if (*str != '\0' && *pattern == '\0')
+			return false;
+		//最复杂的情况，是模式串下一个字符是*，分几种情况
+		if (*(pattern + 1) == '*')
+		{
+			//本身匹配，则几种情况，有一个匹配就成立
+			if (*pattern == *str || (*pattern == '.' && *str != '\0'))
+				//两个同时往下一个比较，相当于*代表一个前面字符
+				return core(str + 1, pattern + 2)
+				//主串看下一个字符，看*是否还能再利用
+				|| core(str + 1, pattern)
+				//模式串看下一个字符，相当于*把前一个字符忽略
+				|| core(str, pattern + 2);
+			//本身不匹配，则忽略这个字母，看模式串下一个字符是否匹配
+			else
+				return core(str, pattern + 2);
+		}
+
+		//简单情况，字符相同或模式串为 . 
+		if (*str == *pattern || (*pattern == '.' && *str != '\0'))
+			return core(str + 1, pattern + 1);
+		//都不满足，不匹配
+		return false;
+	}
+};
+// 
+//面试题：表示数值的字符串
+// 实现函数，判断字符串是否表示数值，包括整数和小数
+// 分析
+// 实际上是字符串正则匹配
+// 数值的模式串为 整数[.[小数]][e|E指数]
+class StrIsNumber final
+{
+public:
+	static bool run(const char* str)
+	{
+		bool ret = false;
+		//参数检查
+		if (str == nullptr) return false;
+		//扫描整数部分（用索引可能更好一些？）
+		if (*str == '+' || *str == '-')
+			++str;
+		//一个符号之后应该有若干数字
+		const char* tmp = str;
+		while (*str != '\0' && *str >= '0' && *str <= '9')
+			++str;
+		//若有整数部分，暂定为true
+		if (str != tmp)
+			ret = true;
+		//继续看，扫描完数字，如果是.，则进入小数判断部分
+		if (*str == '.')
+		{
+			++str;
+			//小数点前后有一边有数字则满足是数字的情况
+			// .123 可看作 0.123
+			// 123. 可看作 123.0
+			// 123.45 完全合法
+			// 所以这里两边判断为 或||
+			tmp = str;
+			while (*str != '\0' && *str >= '0' && *str <= '9')
+				++str;
+			ret = (str != tmp) || ret;
+		}
+		//继续看，是否有指数
+		if (*str == 'e' || *str == 'E')
+		{
+			++str;
+			//e前面和后面都必须有整数
+			// 前面 .e1 e 不能表示数字
+			// 后面 12e 12e+5.5 不表示数字
+			// 所以，这里用 与&&
+			if (*str == '+' || *str == '-')
+				++str;//指数可以有符号
+			tmp = str;
+			while (*str != '\0' && *str >= '0' && *str <= '9')
+				++str;
+			ret = ret && (str != tmp);
+		}
+
+		//最后扫描完刚好是结尾才正确
+		return ret && *str == '\0';
+	}
+};
+// 
 //
 
 int main()
