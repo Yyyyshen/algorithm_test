@@ -350,6 +350,53 @@ public:
 	}
 };
 // 
+//面试题：调整数组顺序使奇数位于偶数前面
+// 暴力解 从头扫描，遇到偶数时记录，并把之后所有数字前移，最后把偶数放到最后
+// 简易解法 扫描数组，碰到偶数出现在奇数前面，交换他们
+//	使用两点法，分别在数组头尾，头指针如果指向数字为偶数并且尾指针指向奇数，则交换
+class adjust_arr_reorder_odd_even {
+	void func1(vector<int>& data)
+	{
+		if (data.empty()) return;
+		int start = 0, end = data.size() - 1;
+		while (start < end)
+		{
+			while (start < end && (data[start] & 0x1) != 0)//位运算判断奇偶
+				++start;//扫描直到找到一个偶数
+			while (start < end && (data[end] & 0x1) == 0)
+				--end;//扫描尾部直到指向奇数
+			//交换两数
+			if (start < end)
+				swap(data[start], data[end]);
+		}
+	}
+	//考虑扩展，增加判断函数，可以适应多种条件
+	void func2(vector<int>& data, bool(*func)(int))
+	{
+		if (data.empty()) return;
+		int start = 0, end = data.size() - 1;
+		while (start < end)
+		{
+			while (start < end && !func(data[start]))
+				++start;
+			while (start < end && func(data[end]))
+				--end;
+			if (start < end)
+				swap(data[start], data[end]);
+		}
+	}
+	bool isEven(int n)
+	{
+		return (n & 0x1) == 0;
+	}
+};
+// 
+//
+
+//
+//代码鲁棒性
+// Robust 也可以是健壮性
+// 程序应能够判断输入是否合乎规范，对非法输入进行处理
 //
 
 int main()
